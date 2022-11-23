@@ -6,10 +6,6 @@ import csv
 import pandas as pd
 
 
-def get_csv(path):
-    with open(path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        return list(reader)
 
 
 def display_csv(path):
@@ -17,21 +13,31 @@ def display_csv(path):
     print(df)
 
 
-def return_csv(path):
+def get_csv(path):
     with open(path, newline='') as csvfile:
-        return csv.DictReader(csvfile)
+        file = csv.DictReader(csvfile)
+        return list(file)
 
 
 def save_csv(csv_input):
-    with open('test_data\groups.csv', mode='w') as groups:
-        employee_writer = csv.writer(groups, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        employee_writer.writerow(csv_input)
+    keys = csv_input[0].keys()
+
+    with open('test_data\groups.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(csv_input)
+
+def extract_csv_data(csv_input):
+    #print(csv_input)
+    for i in csv_input:
+        print(i["Names"])
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data_path = "test_data\data.csv"
-    # get_csv(data_path)
-    # save_csv(return_csv(get_csv(data_path)))
-    display_csv(data_path)
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    #extract_csv_data(get_csv(data_path))
+    #print(get_csv(data_path))
+
+
+    save_csv(get_csv(data_path))
