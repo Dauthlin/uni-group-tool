@@ -1,4 +1,4 @@
-class groups:
+class group:
     def __init__(self, group_number):
         self.students = []
         self.group_number = group_number
