@@ -54,7 +54,8 @@ def initialize(csv_input, group_size):
                 # (csv_input[total])["Group"] = i
                 output_groups[i - 1].add_students(
                     student(csv_input[total]["StudentID"], csv_input[total]["username"], csv_input[total]["surname"],
-                            csv_input[total]["firstName"], csv_input[total]["gender"], csv_input[total]["home"], csv_input[total]["average"],
+                            csv_input[total]["firstName"], csv_input[total]["gender"], csv_input[total]["home"],
+                            csv_input[total]["average"],
                             csv_input[total]["team"], csv_input[total]["status"]))
 
                 total += 1
@@ -75,12 +76,14 @@ def students_to_csv(students_object):
     students = []
     for i in students_object:
         students.append(
-            {"StudentID": i.StudentID, "username": i.username, "surname": i.surname, "firstName": i.firstName, "gender": i.gender,
+            {"StudentID": i.StudentID, "username": i.username, "surname": i.surname, "firstName": i.firstName,
+             "gender": i.gender,
              "home": i.home, "average": i.average, "team": i.team, "status": i.status})
     return students
 
 
-def groups_to_students(groups_array):
+def groups_to_students(AllTeams):
+    groups_array = AllTeams.get_groups()
     for i in groups_array:
         print("group number: ", i.group_number)
         print("group size: ", i.group_size())
@@ -96,10 +99,14 @@ if __name__ == '__main__':
     # extract_csv_data(get_csv(data_path))
     # print(get_csv(data_path))
     # save_csv(get_csv(data_path))
-    initialized_groups = initialize(csv_input, 19)
-    AllTeams = groups(initialized_groups)
-    print(AllTeams.get_groups())
-    #groups_to_students(initialized_groups)
+    AllTeams = groups(initialize(csv_input, 19))
+
+    # single_group = AllTeams.get_groups()[0]
+    # print(single_group.get_student(0))
+    AllTeams.swap_students(0,1,0,0)
+    # print(students_to_csv(single_group.get_students()))
+
+    groups_to_students(AllTeams)
     # save_csv(initialized_groups)
     # students = csv_to_students(csv_input)
     # print(students)
