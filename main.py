@@ -38,6 +38,7 @@ def extract_csv_data(csv_input):
 
 def initialize(csv_input, group_size):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
+    # number_of_groups = 3
     # print(number_of_groups)
     total = 0
     # random.shuffle(csv_input)
@@ -49,8 +50,11 @@ def initialize(csv_input, group_size):
         for i in range(1, number_of_groups + 1):
             if total != len(csv_input):
                 # print(csv_input[total])
-                (csv_input[total])["Group"] = i
-                output_groups[i - 1].add_students(student(csv_input[total]["Names"], (csv_input[total])["Age"]))
+                # (csv_input[total])["Group"] = i
+                output_groups[i - 1].add_students(
+                    student(csv_input[total]["StudentID"], csv_input[total]["username"], csv_input[total]["surname"],
+                            csv_input[total]["firstName"], csv_input[total]["gender"], csv_input[total]["home"], csv_input[total]["average"],
+                            csv_input[total]["team"], csv_input[total]["status"]))
 
                 total += 1
 
@@ -60,14 +64,18 @@ def initialize(csv_input, group_size):
 def csv_to_students(csv_input):
     students = []
     for i in csv_input:
-        students.append(student(i["Names"], i["Age"]))
+        students.append(
+            student(i["StudentID"], i["username"], i["surname"], i["firstName"], i["gender"], i["home"],
+                    i["average"], i["team"], i["status"]))
     return students
 
 
 def students_to_csv(students_object):
     students = []
     for i in students_object:
-        students.append({"Names": i.name, "Age": i.age})
+        students.append(
+            {"StudentID": i.StudentID, "username": i.username, "surname": i.surname, "firstName": i.firstName, "gender": i.gender,
+             "home": i.home, "average": i.average, "team": i.team, "status": i.status})
     return students
 
 
@@ -81,13 +89,15 @@ def groups_to_students(groups_array):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    data_path = "test_data\data.csv"
+    data_path = "test_data\sample.csv"
+    # data_path = "test_data\data.csv"
     csv_input = get_csv(data_path)
     # extract_csv_data(get_csv(data_path))
     # print(get_csv(data_path))
     # save_csv(get_csv(data_path))
-    initialized_groups = initialize(csv_input, 2)
-    groups_to_students(initialized_groups)
+    initialized_groups = initialize(csv_input, 19)
+    print(initialized_groups)
+    #groups_to_students(initialized_groups)
     # save_csv(initialized_groups)
     # students = csv_to_students(csv_input)
     # print(students)
