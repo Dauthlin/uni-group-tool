@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 import random
 from students import student
-from OneGroup import group
-from AllGroups import groups
+from OneGroup import Group
+from AllGroups import Groups
 
 
 def display_csv(path):
@@ -46,7 +46,7 @@ def initialize(csv_input, group_size):
     # print(csv_input)
     output_groups = []
     for i in range(1, number_of_groups + 1):
-        output_groups.append(group(i))
+        output_groups.append(Group(i))
     while total != len(csv_input):
         for i in range(1, number_of_groups + 1):
             if total != len(csv_input):
@@ -99,8 +99,8 @@ if __name__ == '__main__':
     # extract_csv_data(get_csv(data_path))
     # print(get_csv(data_path))
     # save_csv(get_csv(data_path))
-    AllTeams = groups(initialize(csv_input, 19))
-
+    AllTeams = Groups(initialize(csv_input, 19))
+    best_team = AllTeams
     # single_group = AllTeams.get_groups()[0]
     # print(single_group.get_student(0))
     AllTeams.swap_students(0,1,0,0)

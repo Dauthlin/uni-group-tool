@@ -1,6 +1,6 @@
 class student:
-  def __init__(self, StudentID, username,surname,firstName,gender,home,average,team,status):
-    self.StudentID = StudentID
+  def __init__(self, studentID, username, surname, firstName, gender, home, average, team, status):
+    self.StudentID = studentID
     self.username = username
     self.surname = surname
     self.firstName = firstName
