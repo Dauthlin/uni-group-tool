@@ -1,5 +1,5 @@
 from students import student
-from OneGroup import Group
+from One_Group import Group
 from typing import List
 
 

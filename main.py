@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 import random
 from students import student
-from OneGroup import Group
-from AllGroups import Groups
+from One_Group import Group
+from All_Groups import Groups
 
 
 def display_csv(path):
@@ -39,20 +39,15 @@ def extract_csv_data(csv_input):
 
 def initialize(csv_input, group_size):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
-    # number_of_groups = 3
-    # print(number_of_groups)
     total = 0
     # random.shuffle(csv_input)
-    # print(csv_input)
     output_groups = []
     for i in range(1, number_of_groups + 1):
         output_groups.append(Group(i))
     while total != len(csv_input):
         for i in range(1, number_of_groups + 1):
             if total != len(csv_input):
-                # print(csv_input[total])
-                # (csv_input[total])["Group"] = i
-                output_groups[i - 1].add_students(
+                output_groups[i - 1].add_student(
                     student(csv_input[total]["StudentID"], csv_input[total]["username"], csv_input[total]["surname"],
                             csv_input[total]["firstName"], csv_input[total]["gender"], csv_input[total]["home"],
                             csv_input[total]["average"],
