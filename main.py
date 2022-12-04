@@ -95,11 +95,9 @@ def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: 
 
 
 def fitness(modifed_groups: Groups, criteria: List[bool]):
-    modifed_groups.diversity()
+    modifed_groups.diversity("average")
+    print(modifed_groups.get_fitness(("diversity", "average")))
     return modifed_groups
-
-
-
 
 
 # Press the green button in the gutter to run the script.
@@ -114,10 +112,10 @@ if __name__ == '__main__':
     best_team = AllTeams
     # single_group = AllTeams.get_groups()[0]
     # print(single_group.get_student(0))
-    #AllTeams.swap_students(0, 1, 0, 0)
+    # AllTeams.swap_students(0, 1, 0, 0)
     # print(students_to_csv(single_group.get_students()))
     overall_fitness(AllTeams, (2, 3), [True])
-    #groups_to_students(AllTeams)
+    # groups_to_students(AllTeams)
     # save_csv(initialized_groups)
     # students = csv_to_students(csv_input)
     # print(students)
