@@ -8,21 +8,22 @@ import numpy as np
 import random
 from students import student
 from One_Group import Group
-from All_Groups import Groups
+from Many_Groups import Groups
+from typing import List
 
 
-def display_csv(path):
+def display_csv(path: str):
     df = pd.read_csv(path)
     print(df)
 
 
-def get_csv(path):
+def get_csv(path: str):
     with open(path, newline='') as csvfile:
         file = csv.DictReader(csvfile)
         return list(file)
 
 
-def save_csv(csv_input):
+def save_csv(csv_input: dict):
     keys = csv_input[0].keys()
 
     with open('test_data\groups.csv', 'w', newline='') as output_file:
@@ -37,7 +38,7 @@ def extract_csv_data(csv_input):
         print(i["Names"])
 
 
-def initialize(csv_input, group_size):
+def initialize(csv_input: dict, group_size: int):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
     total = 0
     # random.shuffle(csv_input)
@@ -58,7 +59,7 @@ def initialize(csv_input, group_size):
     return output_groups
 
 
-def csv_to_students(csv_input):
+def csv_to_students(csv_input: dict):
     students = []
     for i in csv_input:
         students.append(
@@ -67,7 +68,7 @@ def csv_to_students(csv_input):
     return students
 
 
-def students_to_csv(students_object):
+def students_to_csv(students_object: List[student]):
     students = []
     for i in students_object:
         students.append(
@@ -77,13 +78,28 @@ def students_to_csv(students_object):
     return students
 
 
-def groups_to_students(AllTeams):
-    groups_array = AllTeams.get_groups()
+def groups_to_students(all_teams: Groups):
+    groups_array = all_teams.get_groups()
     for i in groups_array:
         print("group number: ", i.group_number)
         print("group size: ", i.group_size())
         print("students: ", (students_to_csv(i.get_students())))
         print("")
+
+
+def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: List[bool]):
+    group1 = all_teams.get_groups()[modifed_groups_numbers[0]]
+    group2 = all_teams.get_groups()[modifed_groups_numbers[1]]
+    changed_fitness = fitness(Groups([group1, group2]), criteria)
+    return all_teams
+
+
+def fitness(modifed_groups: Groups, criteria: List[bool]):
+    modifed_groups.diversity()
+    return modifed_groups
+
+
+
 
 
 # Press the green button in the gutter to run the script.
@@ -94,14 +110,14 @@ if __name__ == '__main__':
     # extract_csv_data(get_csv(data_path))
     # print(get_csv(data_path))
     # save_csv(get_csv(data_path))
-    AllTeams = Groups(initialize(csv_input, 19))
+    AllTeams = Groups(initialize(csv_input, 3))
     best_team = AllTeams
     # single_group = AllTeams.get_groups()[0]
     # print(single_group.get_student(0))
-    AllTeams.swap_students(0,1,0,0)
+    #AllTeams.swap_students(0, 1, 0, 0)
     # print(students_to_csv(single_group.get_students()))
-
-    groups_to_students(AllTeams)
+    overall_fitness(AllTeams, (2, 3), [True])
+    #groups_to_students(AllTeams)
     # save_csv(initialized_groups)
     # students = csv_to_students(csv_input)
     # print(students)

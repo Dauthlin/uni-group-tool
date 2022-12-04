@@ -1,4 +1,6 @@
 from students import student
+
+
 class Group:
     def __init__(self, group_number: int):
         self.students = []
@@ -19,7 +21,7 @@ class Group:
     def remove_student(self, position: int) -> student:
         return self.students.pop(position)
 
-    def replace(self, position: int, replacement: student) -> student:
-        temp_student = self.students[position]
+    def replace(self, position: int, replacement: student):
         self.students[position] = replacement
-        return temp_student
+
+

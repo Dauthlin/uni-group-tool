@@ -6,7 +6,7 @@ class student:
     self.firstName = firstName
     self.gender = gender
     self.home = home
-    self.average = average
+    self.average = int(average)
     self.team = team
     self.status = status
 
