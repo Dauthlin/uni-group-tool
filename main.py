@@ -41,7 +41,7 @@ def extract_csv_data(csv_input):
 def initialize(csv_input: dict, group_size: int):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
     total = 0
-    # random.shuffle(csv_input)
+    random.shuffle(csv_input)
     output_groups = []
     for i in range(1, number_of_groups + 1):
         output_groups.append(Group(i))
@@ -95,8 +95,15 @@ def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: 
 
 
 def fitness(modifed_groups: Groups, criteria: List[bool]):
-    modifed_groups.diversity("average")
-    print(modifed_groups.get_fitness(("diversity", "average")))
+    # modifed_groups.diversity("average")
+    # print(modifed_groups.get_fitness(("diversity", "average")))
+
+    # modifed_groups.specific_teams([("208026943", 3), ("208063956", 3), ("207069131", 4)])
+    # print(modifed_groups.get_fitness(("specific_teams", "")))
+
+    modifed_groups.amount_to_be_together("gender", "F", 2)
+    print(modifed_groups.get_fitness(("amount_to_be_together", "gender", "F")))
+    # groups_to_students(modifed_groups)
     return modifed_groups
 
 

@@ -27,11 +27,59 @@ class Groups:
     def get_fitness(self, type_of_fitness: tuple):
         result = []
         for single_group in self.groups:
-            if type_of_fitness[0] == "diversity":
+            if type_of_fitness[0] == "diversity":  # ("diversity", "average")
                 result.append((single_group, single_group.get_fitness().get_diversity(type_of_fitness[1])))
+            if type_of_fitness[0] == "specific_teams":  # [("208026943", 3), ("208063956", 3), ("207069131", 4)]
+                result.append((single_group, single_group.get_fitness().get_has_required_students()))
+            if type_of_fitness[0] == "amount_to_be_together":  # ("minimum_of_type", "gender", "M")
+                result.append(
+                    (single_group,
+                     single_group.get_fitness().get_should_be_together(type_of_fitness[1], type_of_fitness[2])))
+
         return result
 
-    def diversity(self, type_of_diversity: str) -> int:
+    def amount_to_be_together(self, minimum_type: str, which_type: str, minimum_number: int):
+        for single_group in self.groups:
+            total = 0
+            # each type in group in required minimum type
+            if minimum_type == "gender":
+                in_group = [single_student.gender for single_student in single_group.get_students() if
+                            single_student.gender == which_type]
+            if minimum_type == "home":
+                in_group = [single_student.home for single_student in single_group.get_students() if
+                            single_student.gender == which_type]
+            #print(in_group)
+            if len(in_group) == 0:
+                total += 0
+            elif len(in_group) < minimum_number:
+                total += -1
+            else:
+                total += 1
+            single_group.get_fitness().set_should_be_together(minimum_type, which_type, total)
+
+    def specific_teams(self, studentid_to_group_number_list: List[tuple]):
+        for single_group in self.groups:
+            total = 0
+            for studentid_to_group_number in studentid_to_group_number_list:
+                # if student is meant to be in this group
+                if single_group.group_number == studentid_to_group_number[1]:
+                    # get all student  ID's in the group
+                    ids_in_group = [single_student.studentid for single_student in single_group.get_students()]
+                    # if the student is in the group +1 otherwise -1
+                    if studentid_to_group_number[0] in ids_in_group:
+                        total += 1
+                    else:
+                        total += -1
+                    # print(studentid_to_group_number)
+
+            single_group.get_fitness().set_has_required_students(total)
+
+    def diversity(self, type_of_diversity: str):
+        def convert_to_number(type_of_diversity_result: str):
+            if (type_of_diversity_result == "H") or (type_of_diversity_result == "M"):
+                return 1
+            else:
+                return 0
 
         for single_group in self.groups:
             total = 0
@@ -41,5 +89,11 @@ class Groups:
                         # print(student1.surname, student2.surname, single_group.group_number)
                         if type_of_diversity == "average":
                             total += abs(student1.average - student2.average)
+                        if type_of_diversity == "home":
+                            total += abs(convert_to_number(student1.home) - convert_to_number(student2.home))
+                            # print(total,student1.username,convert_to_number(student1.home),student2.username,convert_to_number(student2.home))
+                        if type_of_diversity == "gender":
+                            total += abs(convert_to_number(student1.gender) - convert_to_number(student2.gender))
+
             single_group.get_fitness().set_diversity(type_of_diversity, total)
             # print(single_group.get_fitness().get_diversity(type_of_diversity))
