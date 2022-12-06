@@ -4,6 +4,14 @@ class FitnessData:
         self.should_be_together = {"gender": {"M": None, "F": None}, "home": {"H": None, "O": None}}
         self.has_required_students = None
 
+
+    def get_all(self):
+        return self.__dict__
+
+    def set_all(self,dict1):
+        self.__dict__ = dict1
+
+
     def get_diversity(self, key) -> dict:
         return self.diversity[key]
 

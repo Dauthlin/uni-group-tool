@@ -2,11 +2,12 @@ from students import student
 from One_Group import Group
 from typing import List
 from Fitness_Data import FitnessData
+from functools import reduce
 
 
 class Groups:
     def __init__(self, all_groups: List[Group]):
-
+        self.fitness = FitnessData()
         self.groups = all_groups
 
     def get_groups(self) -> List[Group]:
@@ -38,6 +39,37 @@ class Groups:
 
         return result
 
+    def many_groups_fitness(self):
+
+        def merge_dict(dict1, dict2):
+            for key, val in dict1.items():
+                if type(val) == dict:
+                    if key in dict2 and type(dict2[key] == dict):
+                        merge_dict(dict1[key], dict2[key])
+                else:
+                    if key in dict2:
+                        if dict1[key] is None or dict1[key] is None:
+                            pass
+                        else:
+                            dict1[key] = dict2[key] + dict1[key]
+
+            for key, val in dict2.items():
+                if not key in dict1:
+                    dict1[key] = val
+
+            return dict1
+
+        many_fitness = [single_group.get_fitness().get_all() for single_group in self.groups]
+        # print(many_fitness)
+        combined_dict = many_fitness[0]
+        for i in many_fitness[1:]:
+            combined_dict = merge_dict(combined_dict, i)
+        #print(combined_dict)
+        self.fitness.set_all(combined_dict)
+        return self.fitness.get_all()
+        #print(self.fitness.get_all())
+
+
     def amount_to_be_together(self, minimum_type: str, which_type: str, minimum_number: int):
         for single_group in self.groups:
             total = 0
@@ -48,7 +80,7 @@ class Groups:
             if minimum_type == "home":
                 in_group = [single_student.home for single_student in single_group.get_students() if
                             single_student.gender == which_type]
-            #print(in_group)
+            # print(in_group)
             if len(in_group) == 0:
                 total += 0
             elif len(in_group) < minimum_number:
