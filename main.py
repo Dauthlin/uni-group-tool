@@ -88,7 +88,7 @@ def groups_to_students(all_teams: Groups):
 
 
 def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
-    temp = {1: {}, 2: {}}
+    temp = {teams1: {}, teams2: {}}
 
     def collect_comparisons(d, order):
         for k, v in d.items():
@@ -100,17 +100,21 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
 
     overall_fitness1 = teams1.fitness.get_all()
     overall_fitness2 = teams2.fitness.get_all()
-    collect_comparisons(overall_fitness1, 1)
-    collect_comparisons(overall_fitness2, 2)
+    collect_comparisons(overall_fitness1, teams1)
+    collect_comparisons(overall_fitness2, teams2)
 
     score1 = 0
     score2 = 0
-    for i, j in zip(temp[1], temp[2]):
-        # print(temp[1][i], temp[2][j])
-        if temp[1][i] > temp[2][j]:
+    for i, j in zip(temp[teams1], temp[teams2]):
+        print(temp[teams1][i], temp[teams2][j])
+        if temp[teams1][i] > temp[teams2][j]:
             score1 += 1
-        if temp[1][i] < temp[2][j]:
+            if temp[teams1][j] != 0:
+                score2 += temp[teams2][i] / temp[teams1][j]
+        if temp[teams1][i] < temp[teams2][j]:
             score2 += 1
+            if temp[teams2][j] != 0:
+                score1 += temp[teams1][i] / temp[teams2][j]
     print(score1, score2)
     if score1 > score2:
         return teams1
@@ -123,8 +127,8 @@ def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: 
     group2 = all_teams.get_groups()[modifed_groups_numbers[1]]
 
     # groups 3 and 4 are for testing remove later
-    group3 = all_teams.get_groups()[5]
-    group4 = all_teams.get_groups()[6]
+    group3 = all_teams.get_groups()[7]
+    group4 = all_teams.get_groups()[9]
 
     changed_fitness1 = fitness(Groups([group1, group2]), criteria)
     changed_fitness2 = fitness(Groups([group3, group4]), criteria)
@@ -139,7 +143,7 @@ def fitness(modifed_groups: Groups, criteria: List[bool]):
     modifed_groups.specific_teams([("208026943", 3), ("208063956", 3), ("207069131", 4)])
     # print(modifed_groups.get_fitness(("specific_teams", "")))
 
-    modifed_groups.amount_to_be_together("gender", "M", 2)
+    modifed_groups.amount_to_be_together("gender", "F", 2)
     # print(modifed_groups.get_fitness(("amount_to_be_together", "gender", "M")))
     modifed_groups.many_groups_fitness()
 
