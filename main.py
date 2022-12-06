@@ -106,7 +106,7 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
     score1 = 0
     score2 = 0
     for i, j in zip(temp[teams1], temp[teams2]):
-        print(temp[teams1][i], temp[teams2][j])
+        print(i, temp[teams1][i], temp[teams2][j])
         if temp[teams1][i] > temp[teams2][j]:
             score1 += 1
             if temp[teams1][j] != 0:
@@ -144,6 +144,7 @@ def fitness(modifed_groups: Groups, criteria: List[bool]):
     # print(modifed_groups.get_fitness(("specific_teams", "")))
 
     modifed_groups.amount_to_be_together("gender", "F", 2)
+    modifed_groups.amount_to_be_together("gender", "M", 2)
     # print(modifed_groups.get_fitness(("amount_to_be_together", "gender", "M")))
     modifed_groups.many_groups_fitness()
 
