@@ -2,6 +2,7 @@ from students import student
 from One_Group import Group
 from typing import List
 from Fitness_Data import FitnessData
+import copy
 from functools import reduce
 
 
@@ -60,12 +61,12 @@ class Groups:
             return dict1
 
         many_fitness = [single_group.get_fitness().get_all() for single_group in self.groups]
-        # print(many_fitness)
-        combined_dict = many_fitness[0]
+        combined_dict = copy.deepcopy(many_fitness[0])
         for i in many_fitness[1:]:
             combined_dict = merge_dict(combined_dict, i)
         #print(combined_dict)
         self.fitness.set_all(combined_dict)
+
         return self.fitness.get_all()
         #print(self.fitness.get_all())
 
@@ -79,12 +80,11 @@ class Groups:
                             single_student.gender == which_type]
             if minimum_type == "home":
                 in_group = [single_student.home for single_student in single_group.get_students() if
-                            single_student.gender == which_type]
-            # print(in_group)
+                            single_student.home == which_type]
             if len(in_group) == 0:
-                total += 0
+                total += 1
             elif len(in_group) < minimum_number:
-                total += -1
+                total += 0
             else:
                 total += 1
             single_group.get_fitness().set_should_be_together(minimum_type, which_type, total)

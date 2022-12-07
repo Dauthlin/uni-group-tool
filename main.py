@@ -106,7 +106,7 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
     score1 = 0
     score2 = 0
     for i, j in zip(temp[teams1], temp[teams2]):
-        print(i, temp[teams1][i], temp[teams2][j])
+        #print(i, temp[teams1][i], temp[teams2][j])
         if temp[teams1][i] > temp[teams2][j]:
             score1 += 1
             if temp[teams1][j] != 0:
@@ -115,7 +115,7 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
             score2 += 1
             if temp[teams2][j] != 0:
                 score1 += temp[teams1][i] / temp[teams2][j]
-    print(score1, score2)
+    #print(score1, score2)
     if score1 > score2:
         return teams1
     else:
@@ -131,13 +131,21 @@ def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: 
     group4 = all_teams.get_groups()[9]
 
     changed_fitness1 = fitness(Groups([group1, group2]), criteria)
-    changed_fitness2 = fitness(Groups([group3, group4]), criteria)
-    # groups_to_students(changed_fitness2)
-    print(compare_fitness(changed_fitness1, changed_fitness2, {}))
+    #changed_fitness2 = fitness(Groups([group3, group4]), criteria)
+    #groups_to_students(changed_fitness1)
+    #groups_to_students(changed_fitness2)
+
+    print(" ")
+    print(group1.fitness.get_all())
+    #print(changed_fitness2.fitness.get_all())
+
+    #print(compare_fitness(changed_fitness1, changed_fitness2, {}))
 
 
 def fitness(modifed_groups: Groups, criteria: List[bool]):
     modifed_groups.diversity("average")
+    modifed_groups.diversity("home")
+    modifed_groups.diversity("gender")
     # print(modifed_groups.get_fitness(("diversity", "average")))
 
     modifed_groups.specific_teams([("208026943", 3), ("208063956", 3), ("207069131", 4)])
@@ -145,6 +153,8 @@ def fitness(modifed_groups: Groups, criteria: List[bool]):
 
     modifed_groups.amount_to_be_together("gender", "F", 2)
     modifed_groups.amount_to_be_together("gender", "M", 2)
+    modifed_groups.amount_to_be_together("home", "O", 2)
+    modifed_groups.amount_to_be_together("home", "H", 2)
     # print(modifed_groups.get_fitness(("amount_to_be_together", "gender", "M")))
     modifed_groups.many_groups_fitness()
 
