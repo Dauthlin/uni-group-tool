@@ -20,11 +20,22 @@ class Groups:
     def number_of_groups(self) -> int:
         return len(self.groups)
 
+    def replace(self, position: int, replacement: Group):
+        self.groups[position] = replacement
+
     def swap_students(self, group1: int, group2: int, position1: int, position2: int):
         student1 = self.groups[group1].get_student(position1)
         student2 = self.groups[group2].get_student(position2)
         self.groups[group1].replace(position1, student2)
         self.groups[group2].replace(position2, student1)
+
+    def covert(self, what_type: str, data):
+        if what_type == "diversity":
+            self.diversity(data)
+        elif what_type == "specific_teams":
+            self.specific_teams(data)
+        elif what_type == "amount_to_be_together":
+            self.amount_to_be_together(data)
 
     def get_fitness(self, type_of_fitness: tuple):
         result = []
@@ -49,7 +60,9 @@ class Groups:
                         merge_dict(dict1[key], dict2[key])
                 else:
                     if key in dict2:
-                        if dict1[key] is None or dict1[key] is None:
+                        if dict1[key] is None:
+                            dict1[key] = dict2[key]
+                        elif dict2[key] is None:
                             pass
                         else:
                             dict1[key] = dict2[key] + dict1[key]
@@ -64,14 +77,16 @@ class Groups:
         combined_dict = copy.deepcopy(many_fitness[0])
         for i in many_fitness[1:]:
             combined_dict = merge_dict(combined_dict, i)
-        #print(combined_dict)
+        # print(combined_dict)
         self.fitness.set_all(combined_dict)
 
         return self.fitness.get_all()
-        #print(self.fitness.get_all())
+        # print(self.fitness.get_all())
 
-
-    def amount_to_be_together(self, minimum_type: str, which_type: str, minimum_number: int):
+    def amount_to_be_together(self, combined: tuple):
+        minimum_type = combined[0]
+        which_type = combined[1]
+        minimum_number = combined[2]
         for single_group in self.groups:
             total = 0
             # each type in group in required minimum type
@@ -100,8 +115,6 @@ class Groups:
                     # if the student is in the group +1 otherwise -1
                     if studentid_to_group_number[0] in ids_in_group:
                         total += 1
-                    else:
-                        total += -1
                     # print(studentid_to_group_number)
 
             single_group.get_fitness().set_has_required_students(total)
