@@ -9,5 +9,6 @@ class student:
     self.average = int(average)
     self.team = team
     self.status = status
+    self.tabu_time = -100
 
 

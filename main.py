@@ -69,15 +69,21 @@ def csv_to_students(csv_input: dict):
     return students
 
 
-def students_to_csv(students_object: List[student]):
+def students_to_csv(students_object: List[student], team: int):
     students = []
     for i in students_object:
         students.append(
             {"StudentID": i.studentid, "username": i.username, "surname": i.surname, "firstName": i.firstName,
              "gender": i.gender,
-             "home": i.home, "average": i.average, "team": i.team, "status": i.status})
+             "home": i.home, "average": i.average, "team": team, "status": i.status})
     return students
 
+
+def groups_to_csv(groups_object: List[Group]):
+    students = []
+    for group in groups_object.get_groups():
+        students = students + (students_to_csv(group.get_students(), group.group_number))
+    return students
 
 def groups_to_students(all_teams: Groups):
     groups_array = all_teams.get_groups()
@@ -116,11 +122,11 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
             score2 += 1
             if temp[teams2][j] != 0:
                 score1 += temp[teams1][i] / temp[teams2][j]
-    print(score1, score2)
+    # print(score1, score2)
     if score1 > score2:
-        return teams1
+        return True, teams1
     else:
-        return teams2
+        return False, teams2
 
 
 def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: List[bool]):
@@ -180,7 +186,8 @@ def fitness(modifed_groups: Groups, criteria: dict):
     return modifed_groups
 
 
-def generate(org: Groups, tabu: List, current_time: int):
+def generate(org: Groups, best_team: Groups, current_time: int, criteria, weights):
+    tabu_distance = 5
     neighbours = []
     for group1 in range(0, org.number_of_groups()):
         for student1 in range(0, org.get_groups()[group1].group_size()):
@@ -188,13 +195,63 @@ def generate(org: Groups, tabu: List, current_time: int):
                 for student2 in range(0, org.get_groups()[group2].group_size()):
                     if group1 != group2:
                         # modified_group = copy.deepcopy(org)
-
+                        tabu = False
                         org.swap_students(group1, group2, student1, student2)
+                        overall_fitness(org, (group1, group2), criteria)
                         # print(students_to_csv(org.get_groups()[group1].get_students()))
                         # print(students_to_csv(org.get_groups()[group2].get_students()))
+
+                        if current_time - org.get_groups()[group1].get_student(
+                                student1).tabu_time < tabu_distance or current_time - \
+                                org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
+                            tabu = True
+                        # if loop_count == 2:
+                        #     print(tabu)
+                        asp = compare_fitness(org, best_team, weights)[0]
+                        if not tabu or asp:
+                            neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
+                        # undo the swap for speed?
                         org.swap_students(group1, group2, student1, student2)
+                        overall_fitness(org, (group1, group2), criteria)
                         # return
                         # print("first pair", group1, student1, "second pair", group2, student2)
+    return neighbours
+
+
+def select(neighbours: List[Groups], weights):
+    best = neighbours[0]
+    if len(neighbours) != 1:
+        for group in neighbours[1:]:
+            comparison = compare_fitness(group[0], best[0], weights)
+            # print(group[0].fitness.get_all())
+            if comparison[0]:
+                best = group
+    return best
+
+
+def test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights):
+    if compare_fitness(group_to_test, current_best_group, weights)[0]:
+        return group_to_test, current_time
+    return current_best_group, time_when_best_was_found
+
+
+def update(best_neighbour, current_time):
+    # print(best_neighbour)
+    group1 = best_neighbour[1]
+    group2 = best_neighbour[2]
+    student1 = best_neighbour[3]
+    student2 = best_neighbour[4]
+    best_neighbour[0].get_groups()[group1].get_student(student1).tabu_time = current_time
+    best_neighbour[0].get_groups()[group2].get_student(student2).tabu_time = current_time
+    current_time += 1
+    return best_neighbour[0], current_time
+
+
+def stop(current_time, time_when_best_was_found):
+    if current_time - time_when_best_was_found > 20:
+        # print("not done")
+        return True
+    return False
 
 
 # Press the green button in the gutter to run the script.
@@ -207,23 +264,41 @@ if __name__ == '__main__':
     weights = {}
 
     data_path = "test_data\sample.csv"
-    # data_path = "test_data\data.csv"
     csv_input = get_csv(data_path)
     # extract_csv_data(get_csv(data_path))
     # print(get_csv(data_path))
     # save_csv(get_csv(data_path))
-    AllTeams = Groups(initialize(csv_input, size_of_teams))
+    current_all_team = Groups(initialize(csv_input, size_of_teams))
     # get the overall fitness of the whole thing
-    overall_fitness(AllTeams, (range(0, AllTeams.number_of_groups())), criteria)
+    overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
 
     # AllTeams.swap_students(2, 3, 1, 1)
     # overall_fitness(AllTeams, (2,3), criteria)
     # print(AllTeams.fitness.get_all())
-    best_team = copy.deepcopy(AllTeams)
-    tabu = []
+
+    # starting variables initializing
+    best_team = copy.deepcopy(current_all_team)
     current_time = 0
     time_when_best_was_found = current_time
-    generate(AllTeams, tabu, current_time)
+    # print(best_team.fitness.get_all(), time_when_best_was_found)
+    # print("first", current_all_team.number_of_groups())
+
+    # running the optimisation
+    while not stop(current_time, time_when_best_was_found):
+        neighbours = generate(current_all_team, best_team, current_time, criteria, weights)
+        if len(neighbours) != 0:
+            best_neighbour = select(neighbours, weights)
+            best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
+                                                       time_when_best_was_found, weights)
+            current_all_team, current_time = update(best_neighbour, current_time)
+        else:
+            current_all_team, current_time = update(current_all_team, current_time)
+        #print(best_team.fitness.get_all(), time_when_best_was_found)
+
+    # print(best_team.get_groups()[best_neighbour[2]].get_student(best_neighbour[4]).tabu_time)
+    # print(best_team.get_groups()[1].get_student(1).tabu_time)
+    print("final", best_team.fitness.get_all(), time_when_best_was_found)
+    save_csv(groups_to_csv(best_team))
 
     # single_group = AllTeams.get_groups()[0]
     # print(single_group.get_student(0))

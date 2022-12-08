@@ -1,37 +1,60 @@
-Names,Age,Group
-Reid Tanner,10,1
-Zavier Baird,21,2
-Mike Noble,33,3
-Micah White,23,4
-Emmett Huffman,2,5
-Mylie Pruitt,7,6
-Micaela Baxter,35,7
-Beckham Lindsey,30,1
-Krista Coffey,8,2
-Diamond Mcclure,34,3
-German Morgan,1,4
-Dominique Cooper,5,5
-Phoenix Shah,9,6
-Noe Cain,25,7
-Vivian Stephenson,32,1
-Kendall Friedman,20,2
-Isai Gates,31,3
-Kaylie Casey,4,4
-Paxton Bender,16,5
-Dakota Carson,22,6
-Elise Stark,15,7
-Jazmin Combs,27,1
-Amir Delgado,36,2
-Anabella Riggs,29,3
-Katrina Mora,24,4
-Rylee Stafford,18,5
-Cassidy Morrow,14,6
-Tia Montgomery,3,7
-Memphis Davidson,11,1
-Angelica Cervantes,13,2
-Paisley Hudson,17,3
-Vaughn Spears,6,4
-Cadence Maddox,26,5
-Cristian Huynh,19,6
-Jade Choi,12,7
-Ronnie Lambert,28,1
+StudentID,username,surname,firstName,gender,home,average,team,status
+208031587,name1,surname1,firstName1,F,H,100,1,
+208008294,name20,surname20,firstName20,M,H,96,1,
+208016240,name39,surname39,firstName39,F,H,96,1,
+208019531,name58,surname58,firstName58,M,H,83,1,
+208002991,name2,surname2,firstName2,M,H,96,2,
+208065143,name21,surname21,firstName21,M,H,77,2,
+207034595,name40,surname40,firstName40,M,H,81,2,
+205019077,name59,surname59,firstName59,M,H,75,2,
+208026943,name3,surname3,firstName3,M,H,79,3,
+208063956,name22,surname22,firstName22,M,O,46,3,
+207030715,name41,surname41,firstName41,M,H,76,3,
+207069131,name4,surname4,firstName4,M,H,79,4,
+208016615,name23,surname23,firstName23,M,H,86,4,
+208046148,name42,surname42,firstName42,M,O,52,4,
+208014819,name5,surname5,firstName5,M,O,42,5,
+207009782,name24,surname24,firstName24,M,H,96,5,
+208038000,name43,surname43,firstName43,F,H,98,5,
+208065064,name6,surname6,firstName6,F,H,96,6,
+208037463,name25,surname25,firstName25,M,H,100,6,
+207023254,name44,surname44,firstName44,F,H,99,6,
+207045467,name7,surname7,firstName7,M,H,96,7,
+208009084,name26,surname26,firstName26,M,H,96,7,
+207001293,name45,surname45,firstName45,M,H,96,7,
+208064954,name8,surname8,firstName8,M,H,100,8,
+207026694,name27,surname27,firstName27,M,H,96,8,
+208065047,name46,surname46,firstName46,M,H,96,8,
+208022752,name9,surname9,firstName9,M,H,96,9,
+208005937,name28,surname28,firstName28,M,H,81,9,
+208065069,name47,surname47,firstName47,M,H,81,9,
+208065155,name10,surname10,firstName10,M,H,79,10,
+208023029,name29,surname29,firstName29,M,H,77,10,
+207037221,name48,surname48,firstName48,F,H,76,10,
+208009112,name11,surname11,firstName11,M,H,78,11,
+209078254,name30,surname30,firstName30,M,O,50,11,"Arrived for Y2, no Yr 1 score"
+208022796,name49,surname49,firstName49,M,H,52,11,
+208030174,name12,surname12,firstName12,M,H,42,12,
+207032011,name31,surname31,firstName31,F,H,80,12,
+208028201,name50,surname50,firstName50,M,H,99,12,
+208015062,name13,surname13,firstName13,M,H,100,13,
+208034026,name32,surname32,firstName32,M,H,96,13,
+208032727,name51,surname51,firstName51,M,H,96,13,
+208065130,name14,surname14,firstName14,M,H,96,14,
+208047415,name33,surname33,firstName33,M,H,96,14,
+208020120,name52,surname52,firstName52,M,H,82,14,
+208001810,name15,surname15,firstName15,M,H,96,15,
+206041650,name34,surname34,firstName34,M,H,52,15,
+208064977,name53,surname53,firstName53,M,H,76,15,
+208034253,name16,surname16,firstName16,M,H,78,16,
+208046677,name35,surname35,firstName35,M,H,41,16,
+208036828,name54,surname54,firstName54,M,H,52,16,
+207036032,name17,surname17,firstName17,M,H,35,17,
+208023584,name36,surname36,firstName36,F,O,77,17,
+208016469,name55,surname55,firstName55,M,H,96,17,
+207036776,name18,surname18,firstName18,M,O,81,18,
+208014111,name37,surname37,firstName37,M,H,97,18,
+208021639,name56,surname56,firstName56,F,H,96,18,
+208064922,name19,surname19,firstName19,M,H,100,19,
+208028189,name38,surname38,firstName38,M,H,99,19,
+207060859,name57,surname57,firstName57,F,H,99,19,
