@@ -1,6 +1,7 @@
 from students import student
 from Fitness_Data import FitnessData
 
+
 class Group:
     def __init__(self, group_number: int):
         self.students = []
@@ -9,6 +10,8 @@ class Group:
 
     def get_students(self):
         return self.students
+
+
 
     def get_student(self, position: int) -> student:
         return self.students[position]
@@ -30,6 +33,3 @@ class Group:
 
     def set_fitness(self, new_fitness: FitnessData):
         self.fitness = new_fitness
-
-
-

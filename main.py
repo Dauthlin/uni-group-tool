@@ -44,7 +44,7 @@ def extract_csv_data(csv_input):
 def initialize(csv_input: dict, group_size: int):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
     total = 0
-    random.shuffle(csv_input)
+    #random.shuffle(csv_input)
     output_groups = []
     for i in range(1, number_of_groups + 1):
         output_groups.append(Group(i))
@@ -199,26 +199,27 @@ def generate(org: Groups, best_team: Groups, current_time: int, criteria, weight
             for group2 in range(0, org.number_of_groups()):
                 for student2 in range(0, org.get_groups()[group2].group_size()):
                     if group1 != group2:
-                        # modified_group = copy.deepcopy(org)
-                        tabu = False
-                        org.swap_students(group1, group2, student1, student2)
-                        overall_fitness(org, (group1, group2), criteria)
-                        # print(students_to_csv(org.get_groups()[group1].get_students()))
-                        # print(students_to_csv(org.get_groups()[group2].get_students()))
+                        if group2 > group1:
+                            # modified_group = copy.deepcopy(org)
+                            tabu = False
+                            org.swap_students(group1, group2, student1, student2)
+                            overall_fitness(org, (group1, group2), criteria)
+                            # print(students_to_csv(org.get_groups()[group1].get_students()))
+                            # print(students_to_csv(org.get_groups()[group2].get_students()))
 
-                        if current_time - org.get_groups()[group1].get_student(
-                                student1).tabu_time < tabu_distance or current_time - \
-                                org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
-                            tabu = True
-                        # if current_time > 14:
-                        #     print(tabu)
-                        asp = compare_fitness(org, best_team, weights)[0]
-                        if not tabu or asp:
-                            neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
-                        # undo the swap for speed?
-                        org.swap_students(group1, group2, student1, student2)
-                        overall_fitness(org, (group1, group2), criteria)
-                        # return
+                            if current_time - org.get_groups()[group1].get_student(
+                                    student1).tabu_time < tabu_distance or current_time - \
+                                    org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
+                                tabu = True
+                            # if current_time > 14:
+                            #     print(tabu)
+                            asp = compare_fitness(org, best_team, weights)[0]
+                            if not tabu or asp:
+                                neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
+                            # undo the swap for speed?
+                            org.swap_students(group1, group2, student1, student2)
+                            overall_fitness(org, (group1, group2), criteria)
+                            # return
                         # print("first pair", group1, student1, "second pair", group2, student2)
     return neighbours
 
@@ -236,30 +237,33 @@ def sub_section_generate(segments):
         for group2 in range(0, org.number_of_groups()):
             for student2 in range(0, org.get_groups()[group2].group_size()):
                 if group1 != group2:
-                    # modified_group = copy.deepcopy(org)
-                    tabu = False
-                    org.swap_students(group1, group2, student1, student2)
-                    overall_fitness(org, (group1, group2), criteria)
-                    # print(students_to_csv(org.get_groups()[group1].get_students()))
-                    # print(students_to_csv(org.get_groups()[group2].get_students()))
+                    if group2 > group1:
+                        # modified_group = copy.deepcopy(org)
+                        tabu = False
+                        org.swap_students(group1, group2, student1, student2)
+                        overall_fitness(org, (group1, group2), criteria)
+                        # print(students_to_csv(org.get_groups()[group1].get_students()))
+                        # print(students_to_csv(org.get_groups()[group2].get_students()))
 
-                    if current_time - org.get_groups()[group1].get_student(
-                            student1).tabu_time < tabu_distance or current_time - \
-                            org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
-                        tabu = True
-                    # if current_time > 14:
-                    #     print(tabu)
-                    asp = compare_fitness(org, best_team, weights)[0]
-                    if not tabu or asp:
-                        neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
-                    # undo the swap for speed?
-                    org.swap_students(group1, group2, student1, student2)
-                    overall_fitness(org, (group1, group2), criteria)
+                        if current_time - org.get_groups()[group1].get_student(
+                                student1).tabu_time < tabu_distance or current_time - \
+                                org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
+                            tabu = True
+                        asp = compare_fitness(org, best_team, weights)[0]
+                        #print(org.get_groups()[group1])
+                        if not tabu or asp:
+                            if org.get_groups()[group1].get_student(student1).get_all() != org.get_groups()[group2].get_student(student2).get_all():
+                                neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
+                            # else:
+                            #     print(org.get_groups()[group1].get_student(student1).get_all(),org.get_groups()[group2].get_student(student2).get_all())
+                        # undo the swap for speed?
+                        org.swap_students(group1, group2, student1, student2)
+                        overall_fitness(org, (group1, group2), criteria)
     return neighbours
 
 
 def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, criteria, weights):
-    tabu_distance = 5
+    tabu_distance = 10
     segments = [
         (x, range(0, org.get_groups()[x].group_size()), org, best_team, current_time, criteria, weights, tabu_distance)
         for x in range(0, org.number_of_groups())]
@@ -351,23 +355,22 @@ if __name__ == '__main__':
 
     # running the optimisation
     while not stop(current_time, time_when_best_was_found):
-
+        #start = time.time()
         neighbours = generate_multiprocessing(current_all_team, best_team, current_time, criteria, weights)
-
+        #finish = time.time()
         # if len(neighbours) != 0:
         best_neighbour = select(neighbours, weights)
 
         best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
                                                    time_when_best_was_found, weights)
         current_all_team, current_time = update(best_neighbour, current_time)
-    # else:
-    #    current_all_team, current_time = update(current_all_team, current_time)
-
         print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
         print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
               best_neighbour[2], "student1", best_neighbour[3], "student2", best_neighbour[4])
         print("current  ", current_all_team.fitness.get_all())
         print("")
+
+
 
     # print(best_team.get_groups()[best_neighbour[2]].get_student(best_neighbour[4]).tabu_time)
     # print(best_team.get_groups()[1].get_student(1).tabu_time)
@@ -377,4 +380,4 @@ if __name__ == '__main__':
     print("final", best_team.fitness.get_all(), time_when_best_was_found)
     save_csv(groups_to_csv(best_team))
     finish = time.time()
-    print(finish - start)
+    print("time", finish - start)
