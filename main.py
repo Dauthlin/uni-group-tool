@@ -11,6 +11,8 @@ from One_Group import Group
 from Many_Groups import Groups
 from typing import List
 import copy
+import time
+from multiprocessing import Pool
 
 
 def display_csv(path: str):
@@ -42,7 +44,7 @@ def extract_csv_data(csv_input):
 def initialize(csv_input: dict, group_size: int):
     number_of_groups = int(np.floor(len(csv_input) / group_size))
     total = 0
-    # random.shuffle(csv_input)
+    random.shuffle(csv_input)
     output_groups = []
     for i in range(1, number_of_groups + 1):
         output_groups.append(Group(i))
@@ -63,6 +65,8 @@ def initialize(csv_input: dict, group_size: int):
 def csv_to_students(csv_input: dict):
     students = []
     for i in csv_input:
+        print("test")
+        print(i["average"])
         students.append(
             student(i["StudentID"], i["username"], i["surname"], i["firstName"], i["gender"], i["home"],
                     i["average"], i["team"], i["status"]))
@@ -84,6 +88,7 @@ def groups_to_csv(groups_object: List[Group]):
     for group in groups_object.get_groups():
         students = students + (students_to_csv(group.get_students(), group.group_number))
     return students
+
 
 def groups_to_students(all_teams: Groups):
     groups_array = all_teams.get_groups()
@@ -205,7 +210,7 @@ def generate(org: Groups, best_team: Groups, current_time: int, criteria, weight
                                 student1).tabu_time < tabu_distance or current_time - \
                                 org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
                             tabu = True
-                        # if loop_count == 2:
+                        # if current_time > 14:
                         #     print(tabu)
                         asp = compare_fitness(org, best_team, weights)[0]
                         if not tabu or asp:
@@ -216,6 +221,53 @@ def generate(org: Groups, best_team: Groups, current_time: int, criteria, weight
                         # return
                         # print("first pair", group1, student1, "second pair", group2, student2)
     return neighbours
+
+
+def sub_section_generate(segments):
+    neighbours = []
+    group1 = segments[0]
+    org = segments[2]
+    best_team = segments[3]
+    current_time = segments[4]
+    criteria = segments[5]
+    weights = segments[6]
+    tabu_distance = segments[7]
+    for student1 in segments[1]:
+        for group2 in range(0, org.number_of_groups()):
+            for student2 in range(0, org.get_groups()[group2].group_size()):
+                if group1 != group2:
+                    # modified_group = copy.deepcopy(org)
+                    tabu = False
+                    org.swap_students(group1, group2, student1, student2)
+                    overall_fitness(org, (group1, group2), criteria)
+                    # print(students_to_csv(org.get_groups()[group1].get_students()))
+                    # print(students_to_csv(org.get_groups()[group2].get_students()))
+
+                    if current_time - org.get_groups()[group1].get_student(
+                            student1).tabu_time < tabu_distance or current_time - \
+                            org.get_groups()[group2].get_student(student2).tabu_time < tabu_distance:
+                        tabu = True
+                    # if current_time > 14:
+                    #     print(tabu)
+                    asp = compare_fitness(org, best_team, weights)[0]
+                    if not tabu or asp:
+                        neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
+                    # undo the swap for speed?
+                    org.swap_students(group1, group2, student1, student2)
+                    overall_fitness(org, (group1, group2), criteria)
+    return neighbours
+
+
+def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, criteria, weights):
+    tabu_distance = 5
+    segments = [
+        (x, range(0, org.get_groups()[x].group_size()), org, best_team, current_time, criteria, weights, tabu_distance)
+        for x in range(0, org.number_of_groups())]
+    with Pool() as pool:
+        neighbours = pool.map(sub_section_generate, segments)
+    flat_list = [item for sublist in neighbours for item in sublist]
+
+    return flat_list
 
 
 def select(neighbours: List[Groups], weights):
@@ -254,13 +306,27 @@ def stop(current_time, time_when_best_was_found):
     return False
 
 
+def score_custom():
+    pass
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    start = time.time()
+    # check tomorrow
+    # in generating nothing should be passing asp by the end
+    # print more data about neighbours and current (students)
+
     # user input section
-    criteria = {"diversity": ["average", "home", "gender"],
-                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 2), ("home", "O", 2), ("home", "H", 2)],
+    # criteria = {"diversity": ["average", "home", "gender"],
+    #             "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+    #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+
+    # critera for diverse average, 2 females together and 2 online together, and 3 students in specific groups
+    criteria = {"diversity": ["average", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    size_of_teams = 3
+    size_of_teams = 6
     weights = {}
 
     data_path = "test_data\sample.csv"
@@ -285,29 +351,30 @@ if __name__ == '__main__':
 
     # running the optimisation
     while not stop(current_time, time_when_best_was_found):
-        neighbours = generate(current_all_team, best_team, current_time, criteria, weights)
-        if len(neighbours) != 0:
-            best_neighbour = select(neighbours, weights)
-            best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
-                                                       time_when_best_was_found, weights)
-            current_all_team, current_time = update(best_neighbour, current_time)
-        else:
-            current_all_team, current_time = update(current_all_team, current_time)
-        #print(best_team.fitness.get_all(), time_when_best_was_found)
+
+        neighbours = generate_multiprocessing(current_all_team, best_team, current_time, criteria, weights)
+
+        # if len(neighbours) != 0:
+        best_neighbour = select(neighbours, weights)
+
+        best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
+                                                   time_when_best_was_found, weights)
+        current_all_team, current_time = update(best_neighbour, current_time)
+    # else:
+    #    current_all_team, current_time = update(current_all_team, current_time)
+
+        print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
+        print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
+              best_neighbour[2], "student1", best_neighbour[3], "student2", best_neighbour[4])
+        print("current  ", current_all_team.fitness.get_all())
+        print("")
 
     # print(best_team.get_groups()[best_neighbour[2]].get_student(best_neighbour[4]).tabu_time)
     # print(best_team.get_groups()[1].get_student(1).tabu_time)
+
+    for i in best_team.get_groups():
+        print(i.fitness.get_all(), i.group_number)
     print("final", best_team.fitness.get_all(), time_when_best_was_found)
     save_csv(groups_to_csv(best_team))
-
-    # single_group = AllTeams.get_groups()[0]
-    # print(single_group.get_student(0))
-    # AllTeams.swap_students(0, 1, 0, 0)
-    # print(students_to_csv(single_group.get_students()))
-
-    # groups_to_students(AllTeams)
-    # save_csv(initialized_groups)
-    # students = csv_to_students(csv_input)
-    # print(students)
-    # print(csv_input)
-    # print(students_to_csv(students))
+    finish = time.time()
+    print(finish - start)
