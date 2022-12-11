@@ -5,9 +5,9 @@
 import csv
 import pandas as pd
 import numpy as np
-from students import student
-from One_Group import Group
-from Many_Groups import Groups
+from uni_group_tool.students import student
+from uni_group_tool.One_Group import Group
+from uni_group_tool.Many_Groups import Groups
 from typing import List
 import copy
 import time

@@ -6,3 +6,10 @@ setuptools~=57.0.0
 pandas~=1.5.2
 python-dateutil~=2.8.2
 six~=1.16.0
+
+[testing]
+pytest>=6.0
+pytest-cov>=2.0
+mypy>=0.910
+flake8>=3.9
+tox>=3.24

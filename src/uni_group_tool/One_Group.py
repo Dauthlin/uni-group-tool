@@ -1,5 +1,5 @@
-from students import student
-from Fitness_Data import FitnessData
+from uni_group_tool.students import student
+from uni_group_tool.Fitness_Data import FitnessData
 
 
 class Group:

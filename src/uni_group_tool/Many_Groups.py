@@ -1,7 +1,7 @@
-from students import student
-from One_Group import Group
+from uni_group_tool.students import student
+from uni_group_tool.One_Group import Group
 from typing import List
-from Fitness_Data import FitnessData
+from uni_group_tool.Fitness_Data import FitnessData
 import copy
 from functools import reduce
 
