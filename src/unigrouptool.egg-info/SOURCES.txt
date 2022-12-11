@@ -1,0 +1,14 @@
+pyproject.toml
+setup.cfg
+setup.py
+src/uni_group_tool/Fitness_Data.py
+src/uni_group_tool/Many_Groups.py
+src/uni_group_tool/One_Group.py
+src/uni_group_tool/__init__.py
+src/uni_group_tool/main.py
+src/uni_group_tool/students.py
+src/unigrouptool.egg-info/PKG-INFO
+src/unigrouptool.egg-info/SOURCES.txt
+src/unigrouptool.egg-info/dependency_links.txt
+src/unigrouptool.egg-info/requires.txt
+src/unigrouptool.egg-info/top_level.txt
