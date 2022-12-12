@@ -164,16 +164,107 @@ def test_single_fitness():
 
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [2], criteria)
-    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 4, 'average': 132}, 'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 0}}, 'has_required_students': 2}
+    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 4, 'average': 132},
+                                       'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 0}},
+                                       'has_required_students': 2}
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [3], criteria)
-    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 4, 'average': 136}, 'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 0}}, 'has_required_students': 1}
+    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 4, 'average': 136},
+                                       'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 0}},
+                                       'has_required_students': 1}
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [7], criteria)
-    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 0, 'average': 16}, 'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 1}}, 'has_required_students': 0}
+    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 0, 'average': 16},
+                                       'should_be_together': {'gender': {'M': 1, 'F': 1}, 'home': {'H': 1, 'O': 1}},
+                                       'has_required_students': 0}
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [9], criteria)
-    assert group.fitness.get_all() == {'diversity': {'gender': 4, 'home': 0, 'average': 12}, 'should_be_together': {'gender': {'M': 1, 'F': 0}, 'home': {'H': 1, 'O': 1}}, 'has_required_students': 0}
+    assert group.fitness.get_all() == {'diversity': {'gender': 4, 'home': 0, 'average': 12},
+                                       'should_be_together': {'gender': {'M': 1, 'F': 0}, 'home': {'H': 1, 'O': 1}},
+                                       'has_required_students': 0}
 
-# if __name__ == '__main__':
-#     test_single_fitness()
+
+def test_overall_fitness():
+    # checks that the fitness is being filled in correctly, comparisons from manual test
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    criteria = {"diversity": ["average", "home", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+
+    group = copy.deepcopy(current_all_team)
+    main_tools.overall_fitness(group, [2, 3], criteria)
+    assert group.fitness.get_all() == {'diversity': {'gender': 0, 'home': 8, 'average': 268},
+                                       'should_be_together': {'gender': {'M': 2, 'F': 2}, 'home': {'H': 2, 'O': 0}},
+                                       'has_required_students': 3}
+
+    group = copy.deepcopy(current_all_team)
+    main_tools.overall_fitness(group, [7, 9], criteria)
+    assert group.fitness.get_all() == {'diversity': {'gender': 4, 'home': 0, 'average': 28},
+                                       'should_be_together': {'gender': {'M': 2, 'F': 1}, 'home': {'H': 2, 'O': 2}},
+                                       'has_required_students': 0}
+
+
+def test_comparing_groups():
+    # checks that the fitness is being filled in correctly, comparisons from manual test
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    criteria = {"diversity": ["average", "home", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+
+    group1 = copy.deepcopy(current_all_team)
+    main_tools.overall_fitness(group1, [2, 3], criteria)
+    group2 = copy.deepcopy(current_all_team)
+    main_tools.overall_fitness(group2, [7, 9], criteria)
+    result = (main_tools.compare_fitness(group1, group2, {}))
+    assert result[0] is True
+    assert result[1] == group1
+
+
+# swapping test
+
+def test_select():
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    criteria = {"diversity": ["average", "home", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
+    # swapping students that are required to be in specific groups, this means that we know they will score badly
+    swap1 = copy.deepcopy(current_all_team)
+    swap1.swap_students(1, 2, 1, 0)
+    main_tools.overall_fitness(swap1, [1, 2], criteria)
+
+    swap2 = copy.deepcopy(current_all_team)
+    swap2.swap_students(1, 2, 1, 1)
+    main_tools.overall_fitness(swap2, [1, 2], criteria)
+
+    swap3 = copy.deepcopy(current_all_team)
+    swap3.swap_students(1, 3, 1, 0)
+    main_tools.overall_fitness(swap3, [1, 3], criteria)
+
+    # only swap that doesn't swap a student that's required to be in a group
+    swap4 = copy.deepcopy(current_all_team)
+    swap4.swap_students(1, 5, 1, 1)
+    main_tools.overall_fitness(swap4, [1, 2], criteria)
+
+    # selecting the best group, this will be the only group which isn't swapping a required student out of it
+    result = main_tools.select([(swap1, (1, 2, 1, 0)), (swap2, (1, 2, 1, 1)), (swap3, (1, 3, 1, 0)), (swap4, (1, 5, 1, 1))], {})
+    assert result[0] == swap4
+    assert result[1] == (1, 5, 1, 1)
+
+
+if __name__ == '__main__':
+    test_select()

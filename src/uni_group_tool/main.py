@@ -291,7 +291,7 @@ def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, 
     return flat_list
 
 
-def select(neighbours: List[tuple[Groups, int, int, int, int]], weights):
+def select(neighbours: List[tuple[Groups, tuple[int, int, int, int]]], weights):
     best = neighbours[0]
     if len(neighbours) != 1:
         for group in neighbours[1:]:
