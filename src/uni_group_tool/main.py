@@ -3,7 +3,6 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import csv
-import pandas as pd
 import math
 from uni_group_tool.students import student
 from uni_group_tool.One_Group import Group
@@ -15,9 +14,9 @@ from multiprocessing import Pool
 import random
 
 
-def display_csv(path: str):
-    df = pd.read_csv(path)
-    print(df)
+# def display_csv(path: str):
+#     df = pd.read_csv(path)
+#     print(df)
 
 
 def get_csv(path: str):
