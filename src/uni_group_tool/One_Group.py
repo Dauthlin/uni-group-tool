@@ -1,6 +1,6 @@
 from uni_group_tool.students import student
 from uni_group_tool.Fitness_Data import FitnessData
-from typing import List
+from typing import List  # noqa, flake8 issue
 
 
 class Group:

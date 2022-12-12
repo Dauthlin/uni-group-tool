@@ -6,8 +6,6 @@ Author: Michael Beal
 License: MIT
 Platform: unix
 Platform: linux
-Platform: osx
-Platform: cygwin
 Platform: win32
 Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7

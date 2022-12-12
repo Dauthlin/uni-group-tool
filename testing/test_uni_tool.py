@@ -2,6 +2,7 @@ import uni_group_tool.main as main_tools
 import copy
 import os
 
+
 def test_pull_data():
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     lines = [
