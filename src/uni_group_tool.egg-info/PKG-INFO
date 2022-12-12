@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: unigrouptool
+Name: uni-group-tool
 Version: 0.0.0
 Summary: creates groups based on a users criteria
 Author: Michael Beal
@@ -9,10 +9,11 @@ Platform: linux
 Platform: osx
 Platform: cygwin
 Platform: win32
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3 :: Only
 Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
 Requires-Python: >=3.6
+Provides-Extra: testing

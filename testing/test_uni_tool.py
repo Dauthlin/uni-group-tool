@@ -1,9 +1,9 @@
 import uni_group_tool.main as main_tools
 import copy
-
+import os
 
 def test_pull_data():
-    data_path = "test_data/sample_short.csv"
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     lines = [
         {'StudentID': '208031587', 'username': 'name1', 'surname': 'surname1', 'firstName': 'firstName1', 'gender': 'F',
          'home': 'H', 'average': '100', 'team': '', 'status': ''},
@@ -130,7 +130,7 @@ def test_initialize():
     # test that it initalizes correctly
     size_of_teams = 3
     shuffle = False
-    data_path = "test_data/sample_short.csv"
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
     current_all_team = main_tools.groups_to_csv(current_all_team)
@@ -153,7 +153,7 @@ def test_single_fitness():
     # checks that the fitness is being filled in correctly, comparisons from manual test
     size_of_teams = 3
     shuffle = False
-    data_path = "test_data/sample_short.csv"
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
