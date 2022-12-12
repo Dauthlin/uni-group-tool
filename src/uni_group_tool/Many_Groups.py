@@ -1,9 +1,7 @@
-from uni_group_tool.students import student
 from uni_group_tool.One_Group import Group
 from typing import List
 from uni_group_tool.Fitness_Data import FitnessData
 import copy
-from functools import reduce
 
 
 class Groups:
@@ -37,7 +35,7 @@ class Groups:
         elif what_type == "amount_to_be_together":
             self.amount_to_be_together(data)
 
-    def get_fitness(self, type_of_fitness: tuple):
+    def get_fitness(self, type_of_fitness: tuple[str, str, str]):
         result = []
         for single_group in self.groups:
             if type_of_fitness[0] == "diversity":  # ("diversity", "average")
@@ -68,7 +66,7 @@ class Groups:
                             dict1[key] = dict2[key] + dict1[key]
 
             for key, val in dict2.items():
-                if not key in dict1:
+                if key not in dict1:
                     dict1[key] = val
 
             return dict1
@@ -83,7 +81,7 @@ class Groups:
         return self.fitness.get_all()
         # print(self.fitness.get_all())
 
-    def amount_to_be_together(self, combined: tuple):
+    def amount_to_be_together(self, combined: tuple[str, str, int]):
         minimum_type = combined[0]
         which_type = combined[1]
         minimum_number = combined[2]
@@ -104,7 +102,7 @@ class Groups:
                 total += 1
             single_group.get_fitness().set_should_be_together(minimum_type, which_type, total)
 
-    def specific_teams(self, studentid_to_group_number_list: List[tuple]):
+    def specific_teams(self, studentid_to_group_number_list: List[tuple[int, int]]):
         for single_group in self.groups:
             total = 0
             for studentid_to_group_number in studentid_to_group_number_list:

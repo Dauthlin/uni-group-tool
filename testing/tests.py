@@ -174,5 +174,5 @@ def test_single_fitness():
     main_tools.overall_fitness(group, [9], criteria)
     assert group.fitness.get_all() == {'diversity': {'gender': 4, 'home': 0, 'average': 12}, 'should_be_together': {'gender': {'M': 1, 'F': 0}, 'home': {'H': 1, 'O': 1}}, 'has_required_students': 0}
 
-if __name__ == '__main__':
-    test_single_fitness()
+# if __name__ == '__main__':
+#     test_single_fitness()

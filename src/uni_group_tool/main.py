@@ -4,7 +4,7 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import csv
 import pandas as pd
-import numpy as np
+import math
 from uni_group_tool.students import student
 from uni_group_tool.One_Group import Group
 from uni_group_tool.Many_Groups import Groups
@@ -26,13 +26,13 @@ def get_csv(path: str):
         return list(file)
 
 
-def save_csv(csv_input: dict):
+def save_csv(csv_input: dict[str | int, dict[str, str]]):
     keys = csv_input[0].keys()
 
     with open('test_data/groups.csv', 'w', newline='') as output_file:
-        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer = csv.DictWriter(output_file, keys)   # type: ignore
         dict_writer.writeheader()
-        dict_writer.writerows(csv_input)
+        dict_writer.writerows(csv_input)    # type: ignore
 
 
 def extract_csv_data(csv_input):
@@ -41,11 +41,11 @@ def extract_csv_data(csv_input):
         print(i["Names"])
 
 
-def initialize(csv_input: dict, group_size: int, shuffle: bool):
-    number_of_groups = int(np.floor(len(csv_input) / group_size))
+def initialize(csv_input:  dict[str | int, dict[str, str]], group_size: int, shuffle: bool):
+    number_of_groups = int(math.floor(len(csv_input) / group_size))
     total = 0
     if shuffle:
-        random.shuffle(csv_input)
+        random.shuffle(csv_input)   # type: ignore
     output_groups = []
     for i in range(1, number_of_groups + 1):
         output_groups.append(Group(i))
@@ -63,15 +63,13 @@ def initialize(csv_input: dict, group_size: int, shuffle: bool):
     return output_groups
 
 
-def csv_to_students(csv_input: dict):
-    students = []
-    for i in csv_input:
-        print("test")
-        print(i["average"])
-        students.append(
-            student(i["StudentID"], i["username"], i["surname"], i["firstName"], i["gender"], i["home"],
-                    i["average"], i["team"], i["status"]))
-    return students
+# def csv_to_students(csv_input: dict[str| int,dict[str,str]]):
+#     students = []
+#     for i in csv_input:
+#         students.append(
+#             student(i["StudentID"], i["username"], i["surname"], i["firstName"], i["gender"], i["home"],
+#                     i["average"], i["team"], i["status"]))
+#     return students
 
 
 def students_to_csv(students_object: List[student], team: int):
@@ -84,24 +82,23 @@ def students_to_csv(students_object: List[student], team: int):
     return students
 
 
-def groups_to_csv(groups_object: List[Group]):
-    students = []
+def groups_to_csv(groups_object: Groups):
+    students = []   # type: List[Group]
     for group in groups_object.get_groups():
         students = students + (students_to_csv(group.get_students(), group.group_number))
     return students
 
 
-def groups_to_students(all_teams: Groups):
-    groups_array = all_teams.get_groups()
-    for i in groups_array:
-        print("group number: ", i.group_number)
-        print("group size: ", i.group_size())
-        print("students: ", (students_to_csv(i.get_students())))
-        print("")
+# def groups_to_students(all_teams: Groups):
+#     groups_array = all_teams.get_groups()
+#     for i in groups_array:
+#         print("group number: ", i.group_number)
+#         print("group size: ", i.group_size())
+#         print("students: ", (students_to_csv(i.get_students())))
+#         print("")
 
-
-def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
-    temp = {teams1: {}, teams2: {}}
+def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
+    temp = {teams1: {}, teams2: {}}   # type: dict[Groups,dict[str,int]]
 
     def collect_comparisons(d, order):
         for k, v in d.items():
@@ -116,10 +113,9 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
     collect_comparisons(overall_fitness1, teams1)
     collect_comparisons(overall_fitness2, teams2)
 
-    score1 = 0
-    score2 = 0
+    score1 = 0  # type: float
+    score2 = 0  # type: float
     for i, j in zip(temp[teams1], temp[teams2]):
-        # print(i, temp[teams1][i], temp[teams2][j])
         if temp[teams1][i] > temp[teams2][j]:
             score1 += 1
             if temp[teams1][j] != 0:
@@ -135,9 +131,12 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict):
         return False, teams2
 
 
-def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: List[bool]):
+def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple[int, int], criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
     # group1 = all_teams.get_groups()[modifed_groups_numbers[0]]
     # group2 = all_teams.get_groups()[modifed_groups_numbers[1]]
+    # criteria = {"diversity": ["average", "gender"],
+    #             "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
+    #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
     # groups = Groups([all_teams.get_groups()[modifed_groups_numbers[0]]])
     groups = Groups([])
@@ -167,7 +166,7 @@ def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple, criteria: 
     # print(compare_fitness(changed_fitness1, changed_fitness2, {}))
 
 
-def fitness(modifed_groups: Groups, criteria: dict):
+def fitness(modifed_groups: Groups, criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
     for key in criteria:
         # print("key", key)
         for item in criteria[key]:
@@ -254,8 +253,7 @@ def sub_section_generate(segments):
                             asp = compare_fitness(org, best_team, weights)[0]
                             # print(org.get_groups()[group1])
                             if not tabu or asp:
-                                if org.get_groups()[group1].get_student(student1).get_all() != org.get_groups()[
-                                    group2].get_student(student2).get_all():
+                                if org.get_groups()[group1].get_student(student1).get_all() != org.get_groups()[group2].get_student(student2).get_all():
                                     neighbours.append((copy.deepcopy(org), group1, group2, student1, student2))
                                 # else:
                                 #     print(org.get_groups()[group1].get_student(student1).get_all(),org.get_groups()[group2].get_student(student2).get_all())
@@ -294,7 +292,7 @@ def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, 
     return flat_list
 
 
-def select(neighbours: List[Groups], weights):
+def select(neighbours: List[tuple[Groups, int, int, int, int]], weights):
     best = neighbours[0]
     if len(neighbours) != 1:
         for group in neighbours[1:]:
@@ -352,13 +350,13 @@ if __name__ == '__main__':
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
     size_of_teams = 6
     shuffle = True
-    weights = {}
+    weights = {}   # type: dict[str,int]
 
     data_path = "test_data/sample.csv"
     csv_input = get_csv(data_path)
     current_all_team = Groups(initialize(csv_input, size_of_teams, shuffle))
     # get the overall fitness of the whole thing
-    overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
+    overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)   # type: ignore
 
     # starting variables initializing
     best_team = copy.deepcopy(current_all_team)

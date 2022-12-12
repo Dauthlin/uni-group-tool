@@ -1,17 +1,16 @@
 from uni_group_tool.students import student
 from uni_group_tool.Fitness_Data import FitnessData
+from typing import List
 
 
 class Group:
     def __init__(self, group_number: int):
-        self.students = []
+        self.students = []  # type: List[student]
         self.group_number = group_number
         self.fitness = FitnessData()
 
     def get_students(self):
         return self.students
-
-
 
     def get_student(self, position: int) -> student:
         return self.students[position]
