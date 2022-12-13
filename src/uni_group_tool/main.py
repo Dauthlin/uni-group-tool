@@ -131,38 +131,12 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
 
 
 def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple[int, int], criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
-    # group1 = all_teams.get_groups()[modifed_groups_numbers[0]]
-    # group2 = all_teams.get_groups()[modifed_groups_numbers[1]]
-    # criteria = {"diversity": ["average", "gender"],
-    #             "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
-    #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-
-    # groups = Groups([all_teams.get_groups()[modifed_groups_numbers[0]]])
     groups = Groups([])
     for i in modifed_groups_numbers:
         groups.add_group(all_teams.get_groups()[i])
 
     fitness(groups, criteria)
-
-    # for group in all_teams.get_groups():
-    #     print(group.get_fitness().get_all())
-    # print(" ")
     all_teams.many_groups_fitness()
-
-    # groups 3 and 4 are for testing remove later
-    # group3 = all_teams.get_groups()[7]
-    # group4 = all_teams.get_groups()[9]
-
-    # changed_fitness1 = fitness(Groups([group1, group2]), criteria)
-    # changed_fitness2 = fitness(Groups([group3, group4]), criteria)
-    # groups_to_students(changed_fitness1)
-    # groups_to_students(changed_fitness2)
-
-    # print(" ")
-    # print(groups.get_groups()[0].get_fitness().get_all())
-    # print(all_teams.fitness.get_all())
-
-    # print(compare_fitness(changed_fitness1, changed_fitness2, {}))
 
 
 def fitness(modifed_groups: Groups, criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
@@ -171,22 +145,6 @@ def fitness(modifed_groups: Groups, criteria: dict[str, list[str | tuple[str, st
         for item in criteria[key]:
             # print(key, item)
             modifed_groups.covert(key, item)
-    # modifed_groups.many_groups_fitness()
-    # modifed_groups.diversity("average")
-    # modifed_groups.diversity("home")
-    # modifed_groups.diversity("gender")
-    # # print(modifed_groups.get_fitness(("diversity", "average")))
-    #
-    # modifed_groups.specific_teams([("208026943", 3), ("208063956", 3), ("207069131", 4)])
-    # # print(modifed_groups.get_fitness(("specific_teams", "")))
-    #
-    # modifed_groups.amount_to_be_together("gender", "F", 2)
-    # modifed_groups.amount_to_be_together("gender", "M", 2)
-    # modifed_groups.amount_to_be_together("home", "O", 2)
-    # modifed_groups.amount_to_be_together("home", "H", 2)
-    # # print(modifed_groups.get_fitness(("amount_to_be_together", "gender", "M")))
-
-    # groups_to_students(modifed_groups)
     return modifed_groups
 
 

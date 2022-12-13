@@ -230,7 +230,20 @@ def test_comparing_groups():
     assert result[1] == group1
 
 
-# swapping test
+def test_swapping():
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    print(current_all_team.get_groups()[1].get_students())
+    student1 = current_all_team.get_groups()[1].get_student(1)
+    student2 = current_all_team.get_groups()[2].get_student(0)
+    # swaps group1, group2, student1, student2
+    current_all_team.swap_students(1, 2, 1, 0)
+    assert current_all_team.get_groups()[1].get_student(1) == student2
+    assert current_all_team.get_groups()[2].get_student(0) == student1
+
 
 def test_select():
     size_of_teams = 3
@@ -261,10 +274,106 @@ def test_select():
     main_tools.overall_fitness(swap4, [1, 2], criteria)
 
     # selecting the best group, this will be the only group which isn't swapping a required student out of it
-    result = main_tools.select([(swap1, (1, 2, 1, 0)), (swap2, (1, 2, 1, 1)), (swap3, (1, 3, 1, 0)), (swap4, (1, 5, 1, 1))], {})
+    result = main_tools.select(
+        [(swap1, (1, 2, 1, 0)), (swap2, (1, 2, 1, 1)), (swap3, (1, 3, 1, 0)), (swap4, (1, 5, 1, 1))], {})
     assert result[0] == swap4
     assert result[1] == (1, 5, 1, 1)
 
 
+def test_test():
+    # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    criteria = {"diversity": ["average", "home", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
+    # swapping students that are required to be in specific groups, this means that we know they will score badly
+    swap1 = copy.deepcopy(current_all_team)
+    swap1.swap_students(1, 2, 1, 0)
+    main_tools.overall_fitness(swap1, [1, 2], criteria)
+
+    # only swap that doesn't swap a student that's required to be in a group
+    swap4 = current_all_team
+    swap4.swap_students(1, 5, 1, 1)
+    main_tools.overall_fitness(swap4, [1, 2], criteria)
+    # should return the better group (swap4) and what time it was found
+    assert (swap4, 4) == main_tools.test(swap4, swap1, 4, 0, {})
+    assert (swap4, 0) == main_tools.test(swap1, swap4, 4, 0, {})
+
+
+def test_generate():
+    # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
+    size_of_teams = 3
+    shuffle = False
+    data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
+    csv_input = main_tools.get_csv(data_path)
+    criteria = {"diversity": ["average", "home", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
+    subgroup1 = main_tools.Groups(copy.deepcopy(current_all_team.get_groups()[3:5]))
+    current_all_team.swap_students(3, 4, 1, 1)
+    bestgroup = main_tools.Groups(current_all_team.get_groups()[3:5])
+    # print(main_tools.groups_to_csv(subgroup1))
+    # print(main_tools.groups_to_csv(bestgroup))
+    # subdisplay1 = [student.get_students() for student in bestgroup.get_groups()]
+    # for x in subdisplay1:
+    #     for y in x:
+    #         print(y.username)
+    neighbours = main_tools.generate_multiprocessing(subgroup1, bestgroup, 0, criteria, {})
+    names = []
+    for i in neighbours:
+        names.append([(j["username"], j["team"]) for j in main_tools.groups_to_csv(i[0])])
+    assert names == [[('name5', 4), ('name23', 4), ('name42', 4), ('name4', 5), ('name24', 5), ('name43', 5)],
+                     [('name24', 4), ('name23', 4), ('name42', 4), ('name5', 5), ('name4', 5), ('name43', 5)],
+                     [('name43', 4), ('name23', 4), ('name42', 4), ('name5', 5), ('name24', 5), ('name4', 5)],
+                     [('name4', 4), ('name5', 4), ('name42', 4), ('name23', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name24', 4), ('name42', 4), ('name5', 5), ('name23', 5), ('name43', 5)],
+                     [('name4', 4), ('name43', 4), ('name42', 4), ('name5', 5), ('name24', 5), ('name23', 5)],
+                     [('name4', 4), ('name23', 4), ('name5', 4), ('name42', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name24', 4), ('name5', 5), ('name42', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name43', 4), ('name5', 5), ('name24', 5), ('name42', 5)]]
+
+    # repeat with slower generating
+    neighbours = main_tools.generate(subgroup1, bestgroup, 0, criteria, {})
+    names = []
+    for i in neighbours:
+        names.append([(j["username"], j["team"]) for j in main_tools.groups_to_csv(i[0])])
+    assert names == [[('name5', 4), ('name23', 4), ('name42', 4), ('name4', 5), ('name24', 5), ('name43', 5)],
+                     [('name24', 4), ('name23', 4), ('name42', 4), ('name5', 5), ('name4', 5), ('name43', 5)],
+                     [('name43', 4), ('name23', 4), ('name42', 4), ('name5', 5), ('name24', 5), ('name4', 5)],
+                     [('name4', 4), ('name5', 4), ('name42', 4), ('name23', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name24', 4), ('name42', 4), ('name5', 5), ('name23', 5), ('name43', 5)],
+                     [('name4', 4), ('name43', 4), ('name42', 4), ('name5', 5), ('name24', 5), ('name23', 5)],
+                     [('name4', 4), ('name23', 4), ('name5', 4), ('name42', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name24', 4), ('name5', 5), ('name42', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name43', 4), ('name5', 5), ('name24', 5), ('name42', 5)]]
+
+    # change the tabu time for one of the students
+    subgroup1.get_groups()[0].get_student(0).tabu_time = 10
+    neighbours = main_tools.generate_multiprocessing(subgroup1, bestgroup, 11, criteria, {})
+    names = []
+    for i in neighbours:
+        names.append([(j["username"], j["team"]) for j in main_tools.groups_to_csv(i[0])])
+    assert names == [[('name4', 4), ('name5', 4), ('name42', 4), ('name23', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name24', 4), ('name42', 4), ('name5', 5), ('name23', 5), ('name43', 5)],
+                     [('name4', 4), ('name43', 4), ('name42', 4), ('name5', 5), ('name24', 5), ('name23', 5)],
+                     [('name4', 4), ('name23', 4), ('name5', 4), ('name42', 5), ('name24', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name24', 4), ('name5', 5), ('name42', 5), ('name43', 5)],
+                     [('name4', 4), ('name23', 4), ('name43', 4), ('name5', 5), ('name24', 5), ('name42', 5)]]
+
+    # neighbours = main_tools.generate_multiprocessing(subgroup1, bestgroup, 0, criteria, {})
+    # # print(neighbours[0])
+    # names = []
+    # for i in neighbours:
+    #     names.append([(j["username"], j["team"]) for j in main_tools.groups_to_csv(i[0])])
+    # assert names ==
+
+
 if __name__ == '__main__':
-    test_select()
+    test_generate()
