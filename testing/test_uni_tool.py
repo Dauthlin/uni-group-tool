@@ -319,12 +319,6 @@ def test_generate():
     subgroup1 = main_tools.Groups(copy.deepcopy(current_all_team.get_groups()[3:5]))
     current_all_team.swap_students(3, 4, 1, 1)
     bestgroup = main_tools.Groups(current_all_team.get_groups()[3:5])
-    # print(main_tools.groups_to_csv(subgroup1))
-    # print(main_tools.groups_to_csv(bestgroup))
-    # subdisplay1 = [student.get_students() for student in bestgroup.get_groups()]
-    # for x in subdisplay1:
-    #     for y in x:
-    #         print(y.username)
     neighbours = main_tools.generate_multiprocessing(subgroup1, bestgroup, 0, criteria, {})
     names = []
     for i in neighbours:
