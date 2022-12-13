@@ -9,7 +9,6 @@ from uni_group_tool.One_Group import Group
 from uni_group_tool.Many_Groups import Groups
 from typing import List
 import copy
-import time
 from multiprocessing import Pool
 import random
 
@@ -232,20 +231,9 @@ def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, 
         ([x], org, best_team, current_time, criteria, weights, tabu_distance)
         for x in range(0, org.number_of_groups())]
 
-    # segments = [((x, y)) for x, y in zip(range(0, org.number_of_groups()-1),range(org.number_of_groups()-1,0,-1 )) if x <= y ]
-    # print(segments)
-    # segments = [((x, y), org, best_team, current_time, criteria, weights, tabu_distance) if x != y else ([x], org, best_team, current_time, criteria, weights, tabu_distance) for x, y in segments ]
-
-    time_multi_start = time.time()
-    # print("time_pre_multi_start", time_pre_multi_finish - time_pre_multi_start)
-    # time_multi_start = time.time()
-
     with Pool() as pool:
         neighbours = pool.map(sub_section_generate, segments)
-    time_multi_finish = time.time()
-    print("time_multi_start", time_multi_finish - time_multi_start)
     flat_list = [item for sublist in neighbours for item in sublist]
-
     return flat_list
 
 
@@ -254,7 +242,6 @@ def select(neighbours: List[tuple[Groups, tuple[int, int, int, int]]], weights):
     if len(neighbours) != 1:
         for group in neighbours[1:]:
             comparison = compare_fitness(group[0], best[0], weights)
-            # print(group[0].fitness.get_all())
             if comparison[0]:
                 best = group
     return best
@@ -289,31 +276,20 @@ def score_custom():
     pass
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    start = time.time()
+def run(criteria, size_of_teams, shuffle, weights, data_path, debugging):
     # check tomorrow
     # in generating nothing should be passing asp by the end
-    # place timers to see what is taking so long
-
     # user input section
     # criteria = {"diversity": ["average", "home", "gender"],
     #             "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
     #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
     # critera for diverse average, 2 females together and 2 online together, and 3 students in specific groups
-    criteria = {"diversity": ["average", "gender"],
-                "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
-                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    size_of_teams = 6
-    shuffle = True
-    weights = {}   # type: dict[str,int]
 
-    data_path = "test_data/sample.csv"
     csv_input = get_csv(data_path)
     current_all_team = Groups(initialize(csv_input, size_of_teams, shuffle))
     # get the overall fitness of the whole thing
-    overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)   # type: ignore
+    overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)  # type: ignore
 
     # starting variables initializing
     best_team = copy.deepcopy(current_all_team)
@@ -322,39 +298,32 @@ if __name__ == '__main__':
 
     # running the optimisation
     while not stop(current_time, time_when_best_was_found):
-        start_generating = time.time()
         neighbours = generate_multiprocessing(current_all_team, best_team, current_time, criteria, weights)
-        finish_generating = time.time()
-        start_select = time.time()
         best_neighbour = select(neighbours, weights)
-        finish_select = time.time()
-
-        start_test = time.time()
         best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
                                                    time_when_best_was_found, weights)
-        finish_test = time.time()
 
-        start_update = time.time()
         current_all_team, current_time = update(best_neighbour, current_time)
-        finish_update = time.time()
+        if debugging:
+            print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
+            print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
+                  best_neighbour[2], "student1", best_neighbour[3], "student2", best_neighbour[4])
+            print("current  ", current_all_team.fitness.get_all())
+            print("")
 
-        print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
-        print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
-              best_neighbour[2], "student1", best_neighbour[3], "student2", best_neighbour[4])
-        print("current  ", current_all_team.fitness.get_all())
-        print("")
+    return best_team
 
-    # print(best_team.get_groups()[best_neighbour[2]].get_student(best_neighbour[4]).tabu_time)
-    # print(best_team.get_groups()[1].get_student(1).tabu_time)
 
-    for i in best_team.get_groups():
-        print(i.fitness.get_all(), i.group_number)
-    print("final", best_team.fitness.get_all(), time_when_best_was_found)
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    criteria = {"diversity": ["average", "gender"],
+                "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
+                "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
+    size_of_teams = 6
+    shuffle = True
+    weights = {}  # type: dict[str,int]
+
+    data_path = "test_data/sample.csv"
+    debugging = False
+    best_team = run(criteria, size_of_teams, shuffle, weights, data_path, debugging)
     save_csv(groups_to_csv(best_team))
-    finish = time.time()
-    print("time generating", finish_generating - start_generating)
-    print("time select", finish_select - start_select)
-    print("time test", finish_test - start_test)
-    print("time update", finish_update - start_update)
-
-    print("time overall", finish - start)
