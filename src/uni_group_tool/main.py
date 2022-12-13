@@ -27,7 +27,7 @@ def get_csv(path: str):
 def save_csv(csv_input: dict[str | int, dict[str, str]]):
     keys = csv_input[0].keys()
 
-    with open('test_data/groups.csv', 'w', newline='') as output_file:
+    with open('test_data/groups_api.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)   # type: ignore
         dict_writer.writeheader()
         dict_writer.writerows(csv_input)    # type: ignore
@@ -276,7 +276,7 @@ def score_custom():
     pass
 
 
-def run(criteria, size_of_teams, shuffle, weights, data_path, debugging):
+def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving):
     # check tomorrow
     # in generating nothing should be passing asp by the end
     # user input section
@@ -310,7 +310,8 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging):
                   best_neighbour[2], "student1", best_neighbour[3], "student2", best_neighbour[4])
             print("current  ", current_all_team.fitness.get_all())
             print("")
-
+    if saving:
+        save_csv(groups_to_csv(best_team))
     return best_team
 
 
@@ -325,5 +326,6 @@ if __name__ == '__main__':
 
     data_path = "test_data/sample.csv"
     debugging = False
-    best_team = run(criteria, size_of_teams, shuffle, weights, data_path, debugging)
-    save_csv(groups_to_csv(best_team))
+    saving = True
+    run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving)
+
