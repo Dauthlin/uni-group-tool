@@ -330,4 +330,3 @@ if __name__ == '__main__':
     saving = True
     for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving):
         print(i)
-
