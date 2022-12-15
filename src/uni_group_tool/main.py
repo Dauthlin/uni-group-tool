@@ -304,6 +304,7 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving)
                                                    time_when_best_was_found, weights)
 
         current_all_team, current_time = update(best_neighbour, current_time)
+        yield current_time
         if debugging:
             print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
             print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
@@ -312,7 +313,7 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving)
             print("")
     if saving:
         save_csv(groups_to_csv(best_team))
-    return best_team
+    yield best_team
 
 
 # Press the green button in the gutter to run the script.
@@ -320,12 +321,13 @@ if __name__ == '__main__':
     criteria = {"diversity": ["average", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    size_of_teams = 6
+    size_of_teams = 3
     shuffle = True
     weights = {}  # type: dict[str,int]
 
-    data_path = "test_data/sample.csv"
+    data_path = "test_data/sample_short.csv"
     debugging = False
     saving = True
-    run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving)
+    for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving):
+        print(i)
 

@@ -1,6 +1,9 @@
-from flask import Flask, request , jsonify
 from uni_group_tool.main import groups_to_csv, run
+from flask import Flask, request
+from flask_sock import Sock
 
+app = Flask(__name__)
+sock = Sock(app)
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
