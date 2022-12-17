@@ -23,6 +23,18 @@ def get_csv(path: str):
         file = csv.DictReader(csvfile)
         return list(file)
 
+def get_csv_table_students(path: str):
+    file1 = open(path, 'r')
+    Lines = file1.readlines()
+    all_line = []
+    count = 0
+    # Strips the newline character
+    for line in Lines:
+        count += 1
+        all_line.append(line.replace("\n","").split(",")[0:2])
+    return all_line
+
+
 
 def save_csv(csv_input: dict[str | int, dict[str, str]]):
     keys = csv_input[0].keys()

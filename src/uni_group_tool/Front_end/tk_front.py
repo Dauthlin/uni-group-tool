@@ -1,21 +1,28 @@
 from tkinter.filedialog import askopenfilename
 import customtkinter
+from uni_group_tool.main import run, get_csv, get_csv_table_students
 from Criteria_frame import CriteriaFrame
 from Criteria_storage import CriteriaStorage
 from table import Table
-
-
+from ScrollBar_On_Table import AddScrollbar
+from Spefic_teams import SpecificTeams
 class App(customtkinter.CTk):
     def button_event(self):
         print(self.criteria_data.get_all())
-        print(self.path)
 
     def file_explorer(self):
-        self.path = askopenfilename()
+        self.data = get_csv_table_students(askopenfilename())
+        if hasattr(self, 'student_teams'):
+            self.student_teams.destroy()
+        print(self.data)
+        self.student_teams = SpecificTeams(self, data=self.data)
+        self.student_teams.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
 
+        #self.scroll_bar.config(command=self.table.yview)
     def __init__(self):
         super().__init__()
-        self.path = None
+        self.framed_table = None
+        self.data = None
 
         #setting fonts
         self.title_font = customtkinter.CTkFont(size=35)
@@ -72,15 +79,9 @@ class App(customtkinter.CTk):
         self.button = customtkinter.CTkButton(master=self, text="CTkButton", command=self.button_event)
         self.button.grid(row=self.row_count, column=0, padx=20, pady=10)
         self.row_count += 1
-
-        self.items = [(1, 'Raj', 'Mumbai', 19),
-                      (2, 'Aaryan', 'Pune', 18),
-                      (3, 'Vaishnavi', 'Mumbai', 20),
-                      (4, 'Rachna', 'Mumbai', 21),
-                      (5, 'Shubham', 'Delhi', 21)]
-
-        self.table = Table(self, items=self.items)
-        self.table.grid(row=self.row_count, column=0, padx=20, pady=10)
+        self.row_count_marker = self.row_count
+        self.student_teams = SpecificTeams(self,data=[['StudentID', 'username'], ['', '']])
+        self.student_teams.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
         self.row_count += 1
 
 

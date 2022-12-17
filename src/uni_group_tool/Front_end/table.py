@@ -13,5 +13,5 @@ class Table(customtkinter.CTkFrame):
                                                     text=self.items[row][column],
                                                     width=60,
                                                     height=25,
-                                                    corner_radius=8)
+                                                    corner_radius=10)
                 self.label.grid(row=row, column=column)
