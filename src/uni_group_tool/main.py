@@ -27,11 +27,10 @@ def get_csv_table_students(path: str):
     file1 = open(path, 'r')
     Lines = file1.readlines()
     all_line = []
-    count = 0
     # Strips the newline character
     for line in Lines:
-        count += 1
-        all_line.append(line.replace("\n","").split(",")[0:2])
+        all_line.append((line.split(",")[0:2])+[line.split(",")[7]])
+    #print(all_line)
     return all_line
 
 

@@ -6,6 +6,7 @@ from Criteria_storage import CriteriaStorage
 from table import Table
 from ScrollBar_On_Table import AddScrollbar
 from Spefic_teams import SpecificTeams
+from Treeview_table import TreeViewTable
 class App(customtkinter.CTk):
     def button_event(self):
         print(self.criteria_data.get_all())
@@ -15,8 +16,8 @@ class App(customtkinter.CTk):
         if hasattr(self, 'student_teams'):
             self.student_teams.destroy()
         print(self.data)
-        self.student_teams = SpecificTeams(self, data=self.data)
-        self.student_teams.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
+        self.table = TreeViewTable(self, items=self.data)
+        self.table.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
 
         #self.scroll_bar.config(command=self.table.yview)
     def __init__(self):
@@ -80,8 +81,12 @@ class App(customtkinter.CTk):
         self.button.grid(row=self.row_count, column=0, padx=20, pady=10)
         self.row_count += 1
         self.row_count_marker = self.row_count
-        self.student_teams = SpecificTeams(self,data=[['StudentID', 'username'], ['', '']])
-        self.student_teams.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
+
+        #self.student_teams = SpecificTeams(self)
+        data=[['StudentID', 'username','team']]
+        #self.student_teams.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
+        self.table = TreeViewTable(self, items=data)
+        self.table.grid(row=self.row_count_marker, column=0, padx=20, pady=10)
         self.row_count += 1
 
 
