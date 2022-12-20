@@ -1,8 +1,8 @@
 class CriteriaStorage:
     def __init__(self):
         self.diversity = {"gender": False, "home": False, "average": False}
-        self.should_be_together = {"Gender": {"Male": None, "Female": None}, "home": {"Home": None, "Online": None}}
-        self.has_required_students = None
+        self.amount_to_be_together = {"Gender": {"Male": None, "Female": None}, "home": {"Home": None, "Online": None}}
+        self.specific_teams= []
 
     def get_all(self):
         return self.__dict__
@@ -17,13 +17,10 @@ class CriteriaStorage:
         self.diversity[key] = not self.diversity[key]     # type: ignore
 
     def get_should_be_together(self, outer_key: str, inner_key: str) -> int | None:
-        return self.should_be_together[outer_key][inner_key]
+        return self.amount_to_be_together[outer_key][inner_key]
 
     def set_should_be_together(self, outer_key: str, inner_key: str, value: int):
-        self.should_be_together[outer_key][inner_key] = value    # type: ignore
+        self.amount_to_be_together[outer_key][inner_key] = value    # type: ignore
 
-    def get_has_required_students(self) -> int | None:
-        return self.has_required_students
-
-    def set_has_required_students(self, value: int):
-        self.has_required_students = value     # type: ignore
+    def set_specific_teams(self, value: list):
+        self.specific_teams = value     # type: ignore

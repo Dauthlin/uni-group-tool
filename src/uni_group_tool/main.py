@@ -38,7 +38,7 @@ def get_csv_table_students(path: str):
 def save_csv(csv_input: dict[str | int, dict[str, str]]):
     keys = csv_input[0].keys()
 
-    with open('test_data/groups_api.csv', 'w', newline='') as output_file:
+    with open('test_data/groups_front_end.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)   # type: ignore
         dict_writer.writeheader()
         dict_writer.writerows(csv_input)    # type: ignore
@@ -296,7 +296,7 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving)
     #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
     # critera for diverse average, 2 females together and 2 online together, and 3 students in specific groups
-
+    #print("not creashed")
     csv_input = get_csv(data_path)
     current_all_team = Groups(initialize(csv_input, size_of_teams, shuffle))
     # get the overall fitness of the whole thing

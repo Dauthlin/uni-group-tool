@@ -2,6 +2,8 @@ import customtkinter
 
 
 class CriteriaFrame(customtkinter.CTkFrame):
+
+
     def __init__(self, *args, type_to_make, criteria_data, **kwargs):
         super().__init__(*args, **kwargs)
         self.type_to_make = type_to_make
@@ -45,9 +47,12 @@ class CriteriaFrame(customtkinter.CTkFrame):
                                                            values=["Minimum group size", "Minimum amount of groups"])
             self.groups.grid(row=0, column=0, padx=10, pady=10)
             self.value = customtkinter.CTkComboBox(master=self,
-                                                   values=[str(i) for i in range(1, 31)])
+                                                   values=[str(i) for i in range(1, 31)],
+                                                   command=self.update_set_size_of_teams)
             self.value.grid(row=0, column=1, padx=10, pady=10)
 
+    def update_set_size_of_teams(self, data):
+        self.criteria_data.set_size_of_teams(self.value.get())
     def update_criteria_diversity(self):
         self.criteria_data.set_diversity(self.type_to_make[1])
 
