@@ -109,7 +109,7 @@ class App_front(customtkinter.CTk):
         self.all_data = AllDataToSend()
         self.framed_table = None
         self.data = None
-        self.pad_ammount = 5
+        self.pad_ammount = 3
 
 
         #self.tk.call('tk','scaling',5.0)
@@ -124,10 +124,9 @@ class App_front(customtkinter.CTk):
         self.criteria_data = CriteriaStorage()
         self.row_count = 0
         title = customtkinter.CTkLabel(master=self, text="Group creation tool", font=self.title_font)
-        title.grid(side=TOP,pady=self.pad_ammount)
-        title2 = customtkinter.CTkLabel(master=self, text="Results", font=self.sub_title_font)
-        title2.pack(side=TOP, anchor=N, pady=self.pad_ammount)
-        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],row_size=75)
+        title.pack(side=TOP,pady=self.pad_ammount)
+
+        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=30)
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
         self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
@@ -174,12 +173,13 @@ class App_front(customtkinter.CTk):
         subtitle2= customtkinter.CTkLabel(master=self, text="Select which students should be in specific teams",
                                           font=self.sub_sub_title_font)
         subtitle2.pack(side=TOP, pady=self.pad_ammount)
-        self.table = TreeViewTable(self, items=[['StudentID', 'username','team']],row_size=200)
+        self.table = TreeViewTable(self, items=[['StudentID', 'username','team']],row_size=200,title=None,height=10)
         self.table.pack(side=TOP,pady=self.pad_ammount)
+        self.progressbar = customtkinter.CTkProgressBar(master=self, mode="indeterminate", width=400)
+        self.progressbar.pack(side=TOP, pady=self.pad_ammount)
         self.button = customtkinter.CTkButton(master=self, text="Run", command= lambda: self.loop.create_task(self.run_event()))
-        self.button.pack(side=BOTTOM, pady=self.pad_ammount)
-        self.progressbar = customtkinter.CTkProgressBar(master=self,mode="indeterminate",width=400)
-        self.progressbar.pack(side=BOTTOM, pady=self.pad_ammount)
+        self.button.pack(side=TOP, pady=self.pad_ammount)
+
 
 
 if __name__ == "__main__":
