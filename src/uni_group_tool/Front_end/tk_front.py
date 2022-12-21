@@ -11,11 +11,16 @@ import asyncio
 import subprocess
 import sys
 import json
+from help_box_title import helpBox
+
 
 class App:
     async def exec(self):
         self.window = App_front(asyncio.get_event_loop())
         await self.window.show()
+
+
+
 
 
 class App_front(customtkinter.CTk):
@@ -91,8 +96,8 @@ class App_front(customtkinter.CTk):
                     store.append([i,j,int(amount_to_be_together[i][j])])
         criteria['amount_to_be_together'] = store
         self.all_data.set_criteria(criteria)
+        print(self.all_data.get_all())
         await self.Run_program()
-
 
 
     def file_explorer(self):
@@ -125,24 +130,46 @@ class App_front(customtkinter.CTk):
         self.row_count = 0
         title = customtkinter.CTkLabel(master=self, text="Group creation tool", font=self.title_font)
         title.pack(side=TOP,pady=self.pad_ammount)
+        # CreateToolTip(title,"hello this is bob and i like cheese")
+        # title = helpBox(master=self,size=35,text="hello",help_text="hello world")
+        # title.pack(side=TOP, pady=self.pad_ammount)
 
         self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=30)
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
         self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
         self.file.pack(side=TOP,pady=self.pad_ammount)
+        subtitle = helpBox(master=self, size=30, text="",button=True,
+                           help_text="This is a template csv file you can use to enter your students information.\n"
+                                     "StudentID is a string containing the students ID\n"
+                                     "username is the students username\n"
+                                     "surname is the students surname\n"
+                                     "firstname is the students first name\n"
+                                     "gender is the students gender M or F\n"
+                                     "average is the students average mark out of 100\n"
+                                     "team should be left blank or can contain a predetermined team that the student should be in\n"
+                                     "status can be left blank")
+        subtitle.pack(side=TOP, pady=self.pad_ammount)
+        self.row_count += 1
 
         self.row_count += 1
         # set group size
-        self.groups = CriteriaFrame(self, type_to_make=["groups"], criteria_data=self.all_data)
-        self.groups.pack(side=TOP,pady=self.pad_ammount)
-        self.row_count += 1
+
         # set diversity
-        subtitle = customtkinter.CTkLabel(master=self, text="Criteria", font=self.sub_title_font)
-        subtitle.pack(side=TOP,pady=self.pad_ammount)
+        # subtitle = customtkinter.CTkLabel(master=self, text="Criteria", font=self.sub_title_font)
+        # subtitle.pack(side=TOP,pady=self.pad_ammount)
+        subtitle = helpBox(master=self, size=30, text="Criteria", help_text="Select what criteria you would like to be active when generating your groups. \n For each criteria you can select a priority which will make that property more important ")
+        subtitle.pack(side=TOP, pady=self.pad_ammount)
         self.row_count += 1
-        subtitle = customtkinter.CTkLabel(master=self, text="Diversity", font=self.sub_sub_title_font)
-        subtitle.pack(side=TOP,pady=self.pad_ammount)
+        self.groups = CriteriaFrame(self, type_to_make=["groups"], criteria_data=self.all_data)
+        self.groups.pack(side=TOP, pady=self.pad_ammount)
+        self.row_count += 1
+        # subtitle = customtkinter.CTkLabel(master=self, text="Diversity", font=self.sub_sub_title_font)
+        # subtitle.pack(side=TOP,pady=self.pad_ammount)
+        subtitle = helpBox(master=self, size=20, text="Diversity", help_text="This criteria tells the program to try and diversify these attributes of the students.\n for example 'average' will try to create diverse groups with a large range of averages")
+        subtitle.pack(side=TOP, pady=self.pad_ammount)
+
+
         self.row_count += 1
         # set types to be together
         self.criteria_diversity = [
@@ -153,9 +180,13 @@ class App_front(customtkinter.CTk):
             self.criteria_diversity[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
 
 
-        subtitle = customtkinter.CTkLabel(master=self, text="Types that should be together", font=self.sub_sub_title_font)
-        subtitle.pack(side=TOP,pady=self.pad_ammount)
-
+        # subtitle = customtkinter.CTkLabel(master=self, text="Types that should be together", font=self.sub_sub_title_font)
+        # subtitle.pack(side=TOP,pady=self.pad_ammount)
+        subtitle = helpBox(master=self, size=20, text="Types that should be together",
+                           help_text="This criteria allows you to specify which types should be grouped together,\n"
+                                     "for example you can specify that there should be at least 2 girls together in a group.\n "
+                                     "This is used when you don't want specific types to be alone ")
+        subtitle.pack(side=TOP, pady=self.pad_ammount)
 
         self.criteria_together= [CriteriaFrame(self, type_to_make=("types_together", ("Gender", "Male")),
                                                  criteria_data=self.criteria_data),
@@ -170,9 +201,14 @@ class App_front(customtkinter.CTk):
             self.criteria_together[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
         self.row_count_marker = self.row_count
 
-        subtitle2= customtkinter.CTkLabel(master=self, text="Select which students should be in specific teams",
-                                          font=self.sub_sub_title_font)
+
+        subtitle2 = helpBox(master=self, size=20, text="Select which students should be in specific teams",
+                           help_text="Once you have imported a student list using the button at the top of the page,\n you can specify which students you want to be in a specific team.\n"
+                                     "to do this double click in the team cell of the student you would like to set the team for. \n"
+                                     "if you cannot find the student use the search box above to sort through the results ")
         subtitle2.pack(side=TOP, pady=self.pad_ammount)
+
+
         self.table = TreeViewTable(self, items=[['StudentID', 'username','team']],row_size=200,title=None,height=10)
         self.table.pack(side=TOP,pady=self.pad_ammount)
         self.progressbar = customtkinter.CTkProgressBar(master=self, mode="indeterminate", width=400)

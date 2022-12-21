@@ -12,6 +12,7 @@ class SearchBox(customtkinter.CTkFrame):
     def __init__(self, *args,columns,tree, **kwargs):
         super().__init__(*args, **kwargs)
         self.tree = tree
+        self.column = columns
         self.columns = [col for col in columns if (col != "gender") and (col != "home")and (col != "average")and (col != "status") ]
         self.default_search = 0
         self.search_ent_var = StringVar()
@@ -24,16 +25,17 @@ class SearchBox(customtkinter.CTkFrame):
         self.search_ent_var.trace("w", self.filterStudentID)
 
     def update_default_search(self, *args):
-        print(self.search_by.get())
-        for col in range(len(self.columns)):
-            if self.search_by.get() == self.columns[col]:
+        #print(self.search_by.get())
+        for col in range(len(self.column)):
+            if self.search_by.get() == self.column[col]:
+                print(self.search_by.get(),  col)
                 self.default_search = col
 
     def filterStudentID(self, *args):
         ItemsTreeView = self.tree.get_children()
         search = self.search_ent_var.get().lower()
         for each_item in ItemsTreeView:
-            if search in str(self.tree.item(each_item)['values'][self.default_search]):
+            if search in (str(self.tree.item(each_item)['values'][self.default_search])).lower():
                 #print(self.tree.item(each_item)['values'][self.default_search])
                 searchvar = self.tree.item(each_item)['values']
                 self.tree.delete(each_item)

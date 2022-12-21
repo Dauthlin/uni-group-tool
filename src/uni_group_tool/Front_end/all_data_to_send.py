@@ -8,6 +8,7 @@ class AllDataToSend:
         self.data_path = None
         self.debugging = False
         self.saving = True
+        self.min_group_size_or_amount_of_groups = True
 
     def get_all(self):
         return self.__dict__
@@ -19,7 +20,8 @@ class AllDataToSend:
         self.size_of_teams = int(value)
     def shuffle(self, value: bool):
         self.size_of_teams = value
-
+    def set_min_group_size_or_amount_of_groups(self, value: bool):
+        self.min_group_size_or_amount_of_groups = value
     def set_criteria(self, value: CriteriaStorage):
         self.criteria = value
 

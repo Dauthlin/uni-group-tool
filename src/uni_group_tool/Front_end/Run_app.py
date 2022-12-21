@@ -17,9 +17,10 @@ if __name__ == "__main__":
     data_path = data["data_path"]
     debugging = data["debugging"]
     saving = data["saving"]
+    min_group_size_or_amount_of_groups = data["min_group_size_or_amount_of_groups"]
     #print(data)
 
-    for i in run(criteria, size_of_teams, shuffle, weights, data_path, False, saving):
+    for i in run(criteria, size_of_teams, shuffle, weights, data_path, False, saving,min_group_size_or_amount_of_groups):
         if isinstance(i, int):
             # with open('test_data/results.json', 'w', encoding='utf-8') as f:
             #     json.dump({"loop":i}, f, ensure_ascii=False, indent=4)

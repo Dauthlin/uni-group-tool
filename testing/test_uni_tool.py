@@ -134,7 +134,8 @@ def test_initialize():
     shuffle = False
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))  # type: ignore
+    min_group_size_or_amount_of_groups = True
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))  # type: ignore
     current_all_team = main_tools.groups_to_csv(current_all_team)
     # check that each student contains the correct keys
     for i in current_all_team:
@@ -155,13 +156,14 @@ def test_single_fitness():
     # checks that the fitness is being filled in correctly, comparisons from manual test
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))  # type: ignore
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))  # type: ignore
 
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [2], criteria)
@@ -189,13 +191,14 @@ def test_overall_fitness():
     # checks that the fitness is being filled in correctly, comparisons from manual test
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))
 
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [2, 3], criteria)
@@ -214,13 +217,14 @@ def test_comparing_groups():
     # checks that the fitness is being filled in correctly, comparisons from manual test
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
 
     group1 = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group1, [2, 3], criteria)
@@ -234,9 +238,10 @@ def test_comparing_groups():
 def test_swapping():
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     print(current_all_team.get_groups()[1].get_students())
     student1 = current_all_team.get_groups()[1].get_student(1)
     student2 = current_all_team.get_groups()[2].get_student(0)
@@ -249,12 +254,13 @@ def test_swapping():
 def test_select():
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
     # swapping students that are required to be in specific groups, this means that we know they will score badly
     swap1 = copy.deepcopy(current_all_team)
@@ -285,12 +291,13 @@ def test_test():
     # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
     # swapping students that are required to be in specific groups, this means that we know they will score badly
     swap1 = copy.deepcopy(current_all_team)
@@ -310,12 +317,13 @@ def test_generate():
     # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
     subgroup1 = main_tools.Groups(copy.deepcopy(current_all_team.get_groups()[3:5]))
     current_all_team.swap_students(3, 4, 1, 1)
@@ -367,12 +375,13 @@ def test_sub_generate():
     # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
     subgroup1 = main_tools.Groups(copy.deepcopy(current_all_team.get_groups()[3:5]))
     current_all_team.swap_students(3, 4, 1, 1)
@@ -399,12 +408,13 @@ def test_update():
     # test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights)
     size_of_teams = 3
     shuffle = False
+    min_group_size_or_amount_of_groups = True
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     criteria = {"diversity": ["average", "home", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     main_tools.overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)
     current_all_team.swap_students(3, 4, 1, 1)
     current_time = 10
@@ -576,4 +586,4 @@ def test_fitness_data():
 
 
 if __name__ == '__main__':
-    test_initialize()
+    test_comparing_groups()
