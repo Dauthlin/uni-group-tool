@@ -1,4 +1,3 @@
-import json
 import copy
 from tkinter.filedialog import askopenfilename
 import customtkinter
@@ -7,15 +6,58 @@ from Criteria_frame import CriteriaFrame
 from Criteria_storage import CriteriaStorage
 from Treeview_table import TreeViewTable
 from all_data_to_send import AllDataToSend
-from Processing import processing
-from tkinter import Tk, Label, X, Frame, Y, TOP, BOTH,LEFT,BOTTOM
-from websocket import *
+from tkinter import Tk, Label, X, Frame, Y, TOP,LEFT, BOTH,RIGHT,BOTTOM,N,NE
+import asyncio
+import subprocess
+import sys
+import json
+
+class App:
+    async def exec(self):
+        self.window = App_front(asyncio.get_event_loop())
+        await self.window.show()
+
+
 class App_front(customtkinter.CTk):
-    def Run_program(self):
-        for i in run(self.all_data.criteria,int(self.all_data.size_of_teams),self.all_data.shuffle,self.all_data.weights,self.all_data.data_path,self.all_data.debugging,self.all_data.saving):
-            print(i)
-            self.result = i
-    def run_event(self):
+
+
+
+    async def show(self):
+        while True:
+            #self.label["text"] = self.animation
+            #self.animation = self.animation[1:] + self.animation[0]
+            data = json.loads(self.loop_count)
+            if data.get("loop") is not None:
+                self.progressbar.start()
+                print(data)
+            elif data.get("answer") is not None:
+                self.table_results.update_table(data.get("answer"))
+                self.loop_count = '{"not started":0}'
+                self.progressbar.stop()
+                self.progressbar.set(0)
+            else:
+                self.progressbar.stop()
+                self.progressbar.set(0)
+            #self.progres_label.configure(text=self.loop_count)
+            self.update()
+            await asyncio.sleep(1/30)
+
+    async def Run_program(self):
+        async for path in self.execute(self.all_data.get_all()):
+            self.loop_count = (path)
+
+    async def execute(self,json_data):
+        popen = subprocess.Popen([sys.executable, "Run_app.py",json.dumps(json_data) ],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          stdin=subprocess.PIPE,
+                          universal_newlines=True)
+        for stdout_line in iter(popen.stdout.readline, ""):
+            yield stdout_line
+            await asyncio.sleep(1)
+        popen.stdout.close()
+
+    async def run_event(self):
         specific_teams = []
         for line in self.table.tree.get_children():
             if self.table.tree.item(line)['values'][2] != "":
@@ -49,26 +91,27 @@ class App_front(customtkinter.CTk):
                     store.append([i,j,int(amount_to_be_together[i][j])])
         criteria['amount_to_be_together'] = store
         self.all_data.set_criteria(criteria)
-        self.Run_program()
+        await self.Run_program()
 
 
 
     def file_explorer(self):
         path = askopenfilename()
         self.data = get_csv_table_students(path)
-        if hasattr(self, 'table'):
-            self.table.destroy()
-        self.table = TreeViewTable(self, items=self.data)
-        self.table.pack(side=TOP,pady=self.pad_ammount)
+        self.table.update_table(self.data)
         self.all_data.set_data_path(path)
 
         #self.scroll_bar.config(command=self.table.yview)
-    def __init__(self):
+    def __init__(self, loop):
         super().__init__()
+        self.loop = loop
+        self.loop_count = '{"not started":0}'
         self.all_data = AllDataToSend()
         self.framed_table = None
         self.data = None
         self.pad_ammount = 5
+
+
         #self.tk.call('tk','scaling',5.0)
         self.title("Group creation tool")
         #setting fonts
@@ -76,14 +119,20 @@ class App_front(customtkinter.CTk):
         self.sub_title_font = customtkinter.CTkFont(size=30)
         self.sub_sub_title_font = customtkinter.CTkFont(size=20)
 
+
         customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
         self.criteria_data = CriteriaStorage()
         self.row_count = 0
         title = customtkinter.CTkLabel(master=self, text="Group creation tool", font=self.title_font)
-        title.pack(side=TOP,pady=self.pad_ammount)
+        title.grid(side=TOP,pady=self.pad_ammount)
+        title2 = customtkinter.CTkLabel(master=self, text="Results", font=self.sub_title_font)
+        title2.pack(side=TOP, anchor=N, pady=self.pad_ammount)
+        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],row_size=75)
+        self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
         self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
         self.file.pack(side=TOP,pady=self.pad_ammount)
+
         self.row_count += 1
         # set group size
         self.groups = CriteriaFrame(self, type_to_make=["groups"], criteria_data=self.all_data)
@@ -122,18 +171,19 @@ class App_front(customtkinter.CTk):
             self.criteria_together[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
         self.row_count_marker = self.row_count
 
-        #self.student_teams = SpecificTeams(self)
-        data=[['StudentID', 'username','team']]
-        #self.student_teams.grid(row=self.row_count_marker, column=0, pady=self.pad_ammount0, pady=10)
-        self.table = TreeViewTable(self, items=data)
+        subtitle2= customtkinter.CTkLabel(master=self, text="Select which students should be in specific teams",
+                                          font=self.sub_sub_title_font)
+        subtitle2.pack(side=TOP, pady=self.pad_ammount)
+        self.table = TreeViewTable(self, items=[['StudentID', 'username','team']],row_size=200)
         self.table.pack(side=TOP,pady=self.pad_ammount)
-        self.button = customtkinter.CTkButton(master=self, text="Run", command=self.run_event)
+        self.button = customtkinter.CTkButton(master=self, text="Run", command= lambda: self.loop.create_task(self.run_event()))
         self.button.pack(side=BOTTOM, pady=self.pad_ammount)
+        self.progressbar = customtkinter.CTkProgressBar(master=self,mode="indeterminate",width=400)
+        self.progressbar.pack(side=BOTTOM, pady=self.pad_ammount)
 
 
 if __name__ == "__main__":
-    app = App_front()
-    app.mainloop()
+    asyncio.run(App().exec())
 
 # if __name__ == '__main__':
 #     customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark

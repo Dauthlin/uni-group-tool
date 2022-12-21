@@ -37,17 +37,22 @@ class SearchBox(customtkinter.CTkFrame):
                 self.tree.insert("",0,values=searchvar)
 
 class TreeViewTable(customtkinter.CTkFrame):
-    def __init__(self, *args,items, **kwargs):
+    def __init__(self, *args,items,row_size, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.entryPopup = None
+        #[['StudentID', 'username', 'surname','firstName','gender','home','average','status','team']]
+
 
         self.columns = items[0]
+        self.index = items[0].index('team')
         self.tree = ttk.Treeview(self, columns=self.columns, show='headings')
         style = ttk.Style()
         style.theme_use("default")
         style.configure("Treeview",background = self["bg"], foreground="#dce4ee",fieldbackground=self["bg"])
         style.map("Treeview",background=[("selected","#1f6aa5")])
+        for column in self.columns:
+            self.tree.column(column, minwidth=50,width=row_size, stretch=True)
 
 
         # define headings
@@ -75,6 +80,21 @@ class TreeViewTable(customtkinter.CTkFrame):
             self.tree.insert('', tk.END, values=student)
 
         self.tree.grid(row=1, column=0, sticky='nsew')
+    def update_table(self,items):
+        self.tree.delete(*self.tree.get_children())
+        print(items)
+        dict_list = []
+        if isinstance(items[0], dict):
+            for single_dict in items:
+                temp = []
+                for value in single_dict.values():
+                    temp.append(value)
+                dict_list.append(temp)
+            for student in dict_list:
+                self.tree.insert('', tk.END, values=student)
+        else:
+            for student in items[1:]:
+                self.tree.insert('', tk.END, values=student)
 
     def onDoubleClick(self, event):
         # what row and column was clicked on
@@ -84,7 +104,7 @@ class TreeViewTable(customtkinter.CTkFrame):
         selected_id = self.tree.identify_row(event.y)
         column = self.tree.identify_column(event.x)
         column_index = int(column[1:]) -1
-        if column_index != 2:
+        if column_index != self.index:
             return
         selected_values = self.tree.item(selected_id).get("values")[column_index]
         column_box = self.tree.bbox(selected_id,column)

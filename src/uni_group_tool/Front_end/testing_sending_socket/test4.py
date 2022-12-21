@@ -1,16 +1,12 @@
 import tkinter as tk
-from tkinter import ttk
 import asyncio
 
 import customtkinter
 
-from uni_group_tool.main import groups_to_csv, run
 import subprocess
 import sys
 import json
-import select
-import os
-from contextlib import contextmanager
+
 
 
 class App:
