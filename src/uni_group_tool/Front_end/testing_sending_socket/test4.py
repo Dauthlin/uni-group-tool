@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 import asyncio
+
+import customtkinter
+
 from uni_group_tool.main import groups_to_csv, run
 import subprocess
 import sys
@@ -18,13 +21,11 @@ class App:
 
 class Window(tk.Tk):
     def __init__(self, loop):
+        self.loop_count = None
         self.loop = loop
         self.root = tk.Tk()
-        self.animation = "░▒▒▒▒▒"
-        self.label = tk.Label(text="")
-        self.label.grid(row=0, columnspan=2, padx=(8, 8), pady=(16, 0))
-        self.progressbar = ttk.Progressbar(length=280)
-        self.progressbar.grid(row=1, columnspan=2, padx=(8, 8), pady=(16, 0))
+        self.label = customtkinter.CTkLabel(master=self.root, text="CTkLabel")
+        self.label.grid(row=0, column=0, sticky=tk.W, padx=8, pady=8)
         button_block = tk.Button(text="Calculate Sync", width=10, command=self.calculate_sync)
         button_block.grid(row=2, column=0, sticky=tk.W, padx=8, pady=8)
         button_non_block = tk.Button(text="Calculate Async", width=10, command=lambda: self.loop.create_task(self.calculate_async()))
@@ -32,8 +33,9 @@ class Window(tk.Tk):
 
     async def show(self):
         while True:
-            self.label["text"] = self.animation
-            self.animation = self.animation[1:] + self.animation[0]
+            #self.label["text"] = self.animation
+            #self.animation = self.animation[1:] + self.animation[0]
+            self.label.configure(text=self.loop_count)
             self.root.update()
             await asyncio.sleep(.1)
 
@@ -67,15 +69,29 @@ class Window(tk.Tk):
                     "saving": True
                 }
 
-        p=subprocess.Popen([sys.executable, "Run_app.py",json.dumps(json_data) ],
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE,
-                              stdin=subprocess.PIPE)
-        print(type(p.stdout))
-        while p.poll() is None:
-            await asyncio.sleep(0)
-            if len(select.select([p.stdout], [], [], 0)[0]) > 0:
-                print(p.stdout)
+        async for path in self.execute(json_data):
+            self.loop_count = (path)
+
+    async def execute(self,json_data):
+        popen = subprocess.Popen([sys.executable, "Run_app.py",json.dumps(json_data) ],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          stdin=subprocess.PIPE,
+                          universal_newlines=True)
+        for stdout_line in iter(popen.stdout.readline, ""):
+            yield stdout_line
+            await asyncio.sleep(1)
+        popen.stdout.close()
+
+
+        # Example
+
+
+        # print(type(p.stdout))
+        # while p.poll() is None:
+        #     await asyncio.sleep(0)
+        #     if len(select.select([p.stdout], [], [], 0)[0]) > 0:
+        #         print(p.stdout)
 
 
 asyncio.run(App().exec())
