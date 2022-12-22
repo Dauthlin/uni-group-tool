@@ -33,13 +33,13 @@ class helpBox(customtkinter.CTkFrame):
         if not button:
             title = customtkinter.CTkLabel(master=self, text=text, font=customtkinter.CTkFont(size=size))
             title.pack(side=LEFT, pady=3)
-            help = customtkinter.CTkLabel(master=self, text="Move mouse here for help")
+            help = customtkinter.CTkLabel(master=self, text="ⓘ")
             help.pack(side=LEFT, pady=3,padx=20)
             CreateToolTip(help, help_text)
         else:
             file = customtkinter.CTkButton(master=self, text="save Student file template",
                                                 command=self.file_explorer_saving)
             file.pack(side=LEFT, pady=3)
-            help = customtkinter.CTkLabel(master=self, text="Move mouse here for help")
+            help = customtkinter.CTkLabel(master=self, text="ⓘ")
             help.pack(side=LEFT, pady=3, padx=20)
             CreateToolTip(help, help_text)

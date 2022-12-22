@@ -131,7 +131,7 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
         weight = weights.get([k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
         #print(weight,[k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
         if weight is None:
-            weight = 1
+            weight = .6
         if temp[teams1][i] > temp[teams2][j]:
             score1 += 1 * weight
             if temp[teams1][j] != 0:

@@ -25,8 +25,8 @@ class AllDataToSend:
     def set_criteria(self, value: CriteriaStorage):
         self.criteria = value
 
-    def set_weights(self, value: dict):
-        self.weights = value
+    def set_weights(self, key,value):
+        self.weights[key] = value
 
     def set_data_path(self, value: str):
         self.data_path = value

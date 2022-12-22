@@ -134,7 +134,7 @@ class App_front(customtkinter.CTk):
         # title = helpBox(master=self,size=35,text="hello",help_text="hello world")
         # title.pack(side=TOP, pady=self.pad_ammount)
 
-        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=30)
+        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=42)
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
         self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
@@ -173,9 +173,9 @@ class App_front(customtkinter.CTk):
         self.row_count += 1
         # set types to be together
         self.criteria_diversity = [
-            CriteriaFrame(self, type_to_make=("diversity", "average"), criteria_data=self.criteria_data),
-            CriteriaFrame(self, type_to_make=("diversity", "home"), criteria_data=self.criteria_data),
-            CriteriaFrame(self, type_to_make=("diversity", "gender"), criteria_data=self.criteria_data)]
+            CriteriaFrame(self, type_to_make=("diversity", "average"), criteria_data=self.criteria_data, all_data=self.all_data),
+            CriteriaFrame(self, type_to_make=("diversity", "home"), criteria_data=self.criteria_data, all_data=self.all_data),
+            CriteriaFrame(self, type_to_make=("diversity", "gender"), criteria_data=self.criteria_data, all_data=self.all_data)]
         for i in range(self.row_count, self.row_count + len(self.criteria_diversity)):
             self.criteria_diversity[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
 
@@ -189,13 +189,13 @@ class App_front(customtkinter.CTk):
         subtitle.pack(side=TOP, pady=self.pad_ammount)
 
         self.criteria_together= [CriteriaFrame(self, type_to_make=("types_together", ("Gender", "Male")),
-                                                 criteria_data=self.criteria_data),
+                                                 criteria_data=self.criteria_data, all_data=self.all_data),
                                    CriteriaFrame(self, type_to_make=("types_together", ("Gender", "Female")),
-                                                 criteria_data=self.criteria_data),
+                                                 criteria_data=self.criteria_data, all_data=self.all_data),
                                    CriteriaFrame(self, type_to_make=("types_together", ("home", "Home")),
-                                                 criteria_data=self.criteria_data),
+                                                 criteria_data=self.criteria_data, all_data=self.all_data),
                                    CriteriaFrame(self, type_to_make=("types_together", ("home", "Online")),
-                                                 criteria_data=self.criteria_data)]
+                                                 criteria_data=self.criteria_data, all_data=self.all_data)]
 
         for i in range(self.row_count, self.row_count + len(self.criteria_together)):
             self.criteria_together[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
