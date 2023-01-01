@@ -67,7 +67,7 @@ class App_front(customtkinter.CTk):
                           stderr=subprocess.PIPE,
                           stdin=subprocess.PIPE,
                           universal_newlines=True)
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         f = open(data.get_result_path())
         result = json.load(f)
         f.close()
