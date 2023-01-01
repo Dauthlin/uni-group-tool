@@ -16,7 +16,7 @@ from .help_box_title import helpBox
 from.Run_app import run_main
 import tempfile
 import shutil
-
+from os.path import exists
 class App:
     async def exec(self):
         self.window = App_front(asyncio.get_event_loop())
@@ -67,7 +67,8 @@ class App_front(customtkinter.CTk):
                           stderr=subprocess.PIPE,
                           stdin=subprocess.PIPE,
                           universal_newlines=True)
-        await asyncio.sleep(3)
+        if not exists(data.get_result_path()):
+            await asyncio.sleep(.1)
         f = open(data.get_result_path())
         result = json.load(f)
         f.close()
