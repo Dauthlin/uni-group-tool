@@ -1,18 +1,21 @@
 import copy
+import os
 from tkinter.filedialog import askopenfilename
 import customtkinter
-from uni_group_tool.main import run, get_csv, get_csv_table_students
-from Criteria_frame import CriteriaFrame
-from Criteria_storage import CriteriaStorage
-from Treeview_table import TreeViewTable
-from all_data_to_send import AllDataToSend
+from uni_group_tool.main import run, get_csv, get_csv_table_students, groups_to_csv
+from .Criteria_frame import CriteriaFrame
+from .Criteria_storage import CriteriaStorage
+from .Treeview_table import TreeViewTable
+from .all_data_to_send import AllDataToSend
 from tkinter import Tk, Label, X, Frame, Y, TOP,LEFT, BOTH,RIGHT,BOTTOM,N,NE
 import asyncio
 import subprocess
 import sys
 import json
-from help_box_title import helpBox
-
+from .help_box_title import helpBox
+from.Run_app import run_main
+import tempfile
+import shutil
 
 class App:
     async def exec(self):
@@ -31,13 +34,14 @@ class App_front(customtkinter.CTk):
         while True:
             #self.label["text"] = self.animation
             #self.animation = self.animation[1:] + self.animation[0]
-            data = json.loads(self.loop_count)
+            data = self.loop_count
+            #print(data)
             if data.get("loop") is not None:
                 self.progressbar.start()
                 print(data)
             elif data.get("answer") is not None:
                 self.table_results.update_table(data.get("answer"))
-                self.loop_count = '{"not started":0}'
+                self.loop_count = json.loads('{"not started":0}')
                 self.progressbar.stop()
                 self.progressbar.set(0)
             else:
@@ -48,21 +52,38 @@ class App_front(customtkinter.CTk):
             await asyncio.sleep(1/30)
 
     async def Run_program(self):
-        async for path in self.execute(self.all_data.get_all()):
-            self.loop_count = (path)
+        async for path in self.execute(self.all_data):
+            self.loop_count = path
 
-    async def execute(self,json_data):
-        popen = subprocess.Popen([sys.executable, "Run_app.py",json.dumps(json_data) ],
+
+
+    async def execute(self,data):
+
+        dirpath = tempfile.mkdtemp()
+        print(dirpath)
+        data.set_result_path(os.path.join(dirpath ,'results.json'))
+        popen = subprocess.Popen([sys.executable, "src/uni_group_tool/Front_end/Run_app.py",json.dumps(data.get_all()),dirpath ],
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE,
                           stdin=subprocess.PIPE,
                           universal_newlines=True)
-        for stdout_line in iter(popen.stdout.readline, ""):
-            yield stdout_line
+        await asyncio.sleep(2)
+        f = open(data.get_result_path())
+        result = json.load(f)
+        f.close()
+
+        while result.get("answer") is None:
+            f = open(data.get_result_path())
+            result = json.load(f)
+            f.close()
+            yield result
             await asyncio.sleep(1)
-        popen.stdout.close()
+        #popen.stdout.close()
+        shutil.rmtree(dirpath)
+
 
     async def run_event(self):
+        self.button.configure(state="disabled")
         specific_teams = []
         for line in self.table.tree.get_children():
             if self.table.tree.item(line)['values'][2] != "":
@@ -98,19 +119,20 @@ class App_front(customtkinter.CTk):
         self.all_data.set_criteria(criteria)
         print(self.all_data.get_all())
         await self.Run_program()
-
+        self.button.configure(state="enabled")
 
     def file_explorer(self):
         path = askopenfilename()
         self.data = get_csv_table_students(path)
         self.table.update_table(self.data)
         self.all_data.set_data_path(path)
+        self.button.configure(state="enabled")
 
         #self.scroll_bar.config(command=self.table.yview)
     def __init__(self, loop):
         super().__init__()
         self.loop = loop
-        self.loop_count = '{"not started":0}'
+        self.loop_count = json.loads('{"not started":0}')
         self.all_data = AllDataToSend()
         self.framed_table = None
         self.data = None
@@ -130,9 +152,7 @@ class App_front(customtkinter.CTk):
         self.row_count = 0
         title = customtkinter.CTkLabel(master=self, text="Group creation tool", font=self.title_font)
         title.pack(side=TOP,pady=self.pad_ammount)
-        # CreateToolTip(title,"hello this is bob and i like cheese")
-        # title = helpBox(master=self,size=35,text="hello",help_text="hello world")
-        # title.pack(side=TOP, pady=self.pad_ammount)
+
 
         self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=42)
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
@@ -214,12 +234,19 @@ class App_front(customtkinter.CTk):
         self.progressbar = customtkinter.CTkProgressBar(master=self, mode="indeterminate", width=400)
         self.progressbar.pack(side=TOP, pady=self.pad_ammount)
         self.button = customtkinter.CTkButton(master=self, text="Run", command= lambda: self.loop.create_task(self.run_event()))
+        self.button.configure(state="disabled")
         self.button.pack(side=TOP, pady=self.pad_ammount)
 
 
 
-if __name__ == "__main__":
+def run_front_end():
     asyncio.run(App().exec())
+
+
+if __name__ == "__main__":
+    run_front_end()
+
+
 
 # if __name__ == '__main__':
 #     customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark

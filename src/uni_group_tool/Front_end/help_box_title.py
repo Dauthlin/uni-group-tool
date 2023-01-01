@@ -1,6 +1,6 @@
 
 import customtkinter
-from toop_tips import ToolTip
+from .toop_tips import ToolTip
 from tkinter import TOP,LEFT,RIGHT
 from tkinter.filedialog import asksaveasfilename
 import csv

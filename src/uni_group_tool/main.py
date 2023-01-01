@@ -4,12 +4,13 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import csv
 import math
+import multiprocessing
+
 from uni_group_tool.students import student
 from uni_group_tool.One_Group import Group
 from uni_group_tool.Many_Groups import Groups
 from typing import List
 import copy
-from multiprocessing import Pool
 import random
 
 
@@ -249,7 +250,7 @@ def generate_multiprocessing(org: Groups, best_team: Groups, current_time: int, 
         ([x], org, best_team, current_time, criteria, weights, tabu_distance)
         for x in range(0, org.number_of_groups())]
 
-    with Pool() as pool:
+    with multiprocessing.Pool() as pool:
         neighbours = pool.map(sub_section_generate, segments)
     flat_list = [item for sublist in neighbours for item in sublist]
     return flat_list
@@ -295,6 +296,7 @@ def score_custom():
 
 
 def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,min_group_size_or_amount_of_groups):
+
     # check tomorrow
     # in generating nothing should be passing asp by the end
     # user input section

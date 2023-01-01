@@ -1,21 +1,26 @@
-from Criteria_storage import CriteriaStorage
+from .Criteria_storage import CriteriaStorage
 class AllDataToSend:
     def __init__(self):
-        self.size_of_teams = 1
+        self.size_of_teams = 2
         self.shuffle = True
         self.criteria = None
         self.weights = {}
         self.data_path = None
         self.debugging = False
-        self.saving = True
+        self.saving = False
         self.min_group_size_or_amount_of_groups = True
+        self.result_path = None
 
     def get_all(self):
         return self.__dict__
 
     def set_all(self, dict1):
         self.__dict__ = dict1
+    def set_result_path(self, path):
+        self.result_path = path
 
+    def get_result_path(self):
+        return self.result_path
     def set_size_of_teams(self, value):
         self.size_of_teams = int(value)
     def shuffle(self, value: bool):

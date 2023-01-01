@@ -1,5 +1,5 @@
 import customtkinter
-from toop_tips import ToolTip
+from .toop_tips import ToolTip
 def CreateToolTip(widget, text):
     toolTip = ToolTip(widget)
 
@@ -42,7 +42,6 @@ class CriteriaFrame(customtkinter.CTkFrame):
             self.label.grid(row=0, column=1, padx=10, pady=10)
             self.priority = customtkinter.CTkSegmentedButton(master=self,
                                                              values=["Very low", "Low", "Medium", "High", "Very high"],command=self.priority_update,state="disabled")
-            self.priority.set("Medium")
             self.priority.grid(row=0, column=2, padx=10, pady=10)
         if type_to_make[0] == "types_together":
             if type_to_make[1][1] == "Home":
@@ -66,7 +65,7 @@ class CriteriaFrame(customtkinter.CTkFrame):
             if temp_text == "Female":
                 CreateToolTip(self.label1, "This will attempt to group Female students together\n This will try to enforce that at least N Female students are together in a group ")
             if temp_text == "Working on campus":
-                CreateToolTip(self.label1, "This will attempt to group students that are working on campus together\n This will try to enforce that at least N students on campus are together in a group ")
+                CreateToolTip(self.label1, "This will attempt to group students that are working on campus together\n This will try to enforce that at least N students on campus are together in a group")
             if temp_text == "Working Online":
                 CreateToolTip(self.label1, "This will attempt to group students that are working Online together\n This will try to enforce that at least N students that are working online in a group ")
             self.label2 = customtkinter.CTkLabel(master=self,
@@ -114,8 +113,10 @@ class CriteriaFrame(customtkinter.CTkFrame):
     def update_criteria_diversity(self):
         if self.checkbox.get() == "on":
             self.priority.configure(state="normal")
+            self.priority.set("Medium")
         else:
             self.priority.configure(state="disabled")
+            self.priority.set(None)
         self.criteria_data.set_diversity(self.type_to_make[1])
 
     def update_criteria_together(self, data):
