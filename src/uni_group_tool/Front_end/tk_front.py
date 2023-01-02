@@ -32,24 +32,27 @@ class App_front(customtkinter.CTk):
 
     async def show(self):
         while True:
-            #self.label["text"] = self.animation
-            #self.animation = self.animation[1:] + self.animation[0]
-            data = self.loop_count
-            #print(data)
-            if data.get("loop") is not None:
-                self.progressbar.start()
-                print(data)
-            elif data.get("answer") is not None:
-                self.table_results.update_table(data.get("answer"))
-                self.loop_count = json.loads('{"not started":0}')
-                self.progressbar.stop()
-                self.progressbar.set(0)
-            else:
-                self.progressbar.stop()
-                self.progressbar.set(0)
-            #self.progres_label.configure(text=self.loop_count)
-            self.update()
-            await asyncio.sleep(1/30)
+            try:
+                #self.label["text"] = self.animation
+                #self.animation = self.animation[1:] + self.animation[0]
+                data = self.loop_count
+                #print(data)
+                if data.get("loop") is not None:
+                    self.progressbar.start()
+                    print(data)
+                elif data.get("answer") is not None:
+                    self.table_results.update_table(data.get("answer"))
+                    self.loop_count = json.loads('{"not started":0}')
+                    self.progressbar.stop()
+                    self.progressbar.set(0)
+                else:
+                    self.progressbar.stop()
+                    self.progressbar.set(0)
+                #self.progres_label.configure(text=self.loop_count)
+                self.update()
+                await asyncio.sleep(1/30)
+            except Exception:
+                return
 
     async def Run_program(self):
         async for path in self.execute(self.all_data):
@@ -67,7 +70,7 @@ class App_front(customtkinter.CTk):
                           stderr=subprocess.PIPE,
                           stdin=subprocess.PIPE,
                           universal_newlines=True)
-        if not exists(data.get_result_path()):
+        while not exists(data.get_result_path()):
             await asyncio.sleep(.1)
         f = open(data.get_result_path())
         result = json.load(f)
