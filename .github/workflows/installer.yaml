@@ -19,5 +19,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: run_tool.exe
-        path: ./dist/windows\run_tool.exe
+        name: run_tool
+        path: ./dist/windows
