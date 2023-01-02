@@ -5,10 +5,10 @@ block_cipher = None
 
 
 a = Analysis(
-    ['C:/Users/Michael/OneDrive/uni/project/coding/run_tool.py'],
+    ['coding/run_tool.py'],
     pathex=[],
     binaries=[],
-    datas=[('C:/Users/Michael/OneDrive/uni/project/coding/venv/Lib/site-packages/customtkinter', 'customtkinter/')],
+    datas=[('coding/venv/Lib/site-packages/customtkinter', 'customtkinter/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
