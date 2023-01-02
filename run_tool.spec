@@ -5,13 +5,12 @@ block_cipher = None
 
 
 a = Analysis(
-    ['C:/Users/Michael/OneDrive/uni/project/coding/run_tool.py'],
+    ['run_tool.py'],
     pathex=[],
     binaries=[],
     datas=[],
     hiddenimports=[],
     hookspath=[],
-    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
