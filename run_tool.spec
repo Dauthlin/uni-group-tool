@@ -8,7 +8,7 @@ a = Analysis(
     ['run_tool.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('/venv/Lib/site-packages/customtkinter', 'customtkinter/')],
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],
