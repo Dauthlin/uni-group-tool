@@ -1,10 +1,14 @@
 import copy
 import csv
+import os
+
 import customtkinter
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import asksaveasfilename
+import glob
+from xlsxwriter.workbook import Workbook
 
 
 
@@ -49,11 +53,17 @@ class TreeViewTable(customtkinter.CTkFrame):
         self.entryPopup = None
         #[['StudentID', 'username', 'surname','firstName','gender','home','average','status','team']]
         self.sub_title_font = customtkinter.CTkFont(size=30)
+        self.highlight_gender = False
+        self.highlight_location = False
         if title is not None:
             title2 = customtkinter.CTkLabel(master=self, text="Results", font=self.sub_title_font)
             title2.grid(row=0, column=0, sticky='ns')
+            self.highlight_gender_button = customtkinter.CTkCheckBox(master=self, text="Highlight gender", onvalue="on", offvalue="off", command=self.toggle_highlighting_gender)
+            self.highlight_gender_button.grid(row=3, column=0)
+            self.highlight_location_button = customtkinter.CTkCheckBox(master=self, text="Highlight origin", onvalue="on", offvalue="off", command=self.toggle_highlighting_location)
+            self.highlight_location_button.grid(row=4, column=0)
             file = customtkinter.CTkButton(master=self, text="save results as csv", command=self.file_explorer_saving)
-            file.grid(row=3, column=0)
+            file.grid(row=5, column=0)
 
         self.columns = items[0]
         self.index = items[0].index('team')
@@ -92,15 +102,46 @@ class TreeViewTable(customtkinter.CTkFrame):
 
         self.tree.grid(row=2, column=0, sticky='nsew')
 
+    def toggle_highlighting_gender(self):
+        self.highlight_gender = not self.highlight_gender
+        print(self.highlight_gender)
+
+    def toggle_highlighting_location(self):
+        self.highlight_location = not self.highlight_location
+        print(self.highlight_location)
+
 
     def file_explorer_saving(self):
         file = asksaveasfilename(defaultextension=".csv")
-        print(type(self.items_store[0]),self.items_store[0])
+        print(type(self.items_store[0]), self.items_store[0])
         keys = self.items_store[0].keys()
         with open(file, 'w', newline='') as output_file:
             dict_writer = csv.DictWriter(output_file, keys)  # type: ignore
             dict_writer.writeheader()
             dict_writer.writerows(self.items_store)  # type: ignore
+        if self.highlight_location or  self.highlight_gender:
+                workbook = Workbook(file[:-4] + '.xlsx')
+                worksheet = workbook.add_worksheet()
+                format1 = workbook.add_format({'bg_color': '#FFC7CE','font_color': '#9C0006'})
+                format2 = workbook.add_format({'bg_color': '#C6EFCE','font_color': '#006100'})
+
+                with open(file, 'rt', encoding='utf8') as f:
+                    reader = csv.reader(f)
+                    for r, row in enumerate(reader):
+                        for c, col in enumerate(row):
+                            worksheet.write(r, c, col)
+                if self.highlight_location:
+                    worksheet.conditional_format('F1:F1000', {'type': 'cell',
+                                             'criteria': '==',
+                                             'value': '"O"',
+                                             'format': format1})
+                if self.highlight_gender:
+                    worksheet.conditional_format('E1:E1000', {'type': 'cell',
+                                                              'criteria': '==',
+                                                              'value': '"F"',
+                                                              'format': format2})
+                workbook.close()
+                os.remove(file)
 
     def update_table(self,items):
         self.items_store = copy.deepcopy(items)
