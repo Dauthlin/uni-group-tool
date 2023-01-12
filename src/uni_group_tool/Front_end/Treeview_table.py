@@ -10,8 +10,25 @@ from tkinter.filedialog import asksaveasfilename
 import glob
 from xlsxwriter.workbook import Workbook
 
+class highlighting(customtkinter.CTkFrame):
+    def __init__(self, *args,text,**kwargs):
+        super().__init__(*args, **kwargs)
+        self.colour = "Green"
+        self.highlight = False
+        self.highlight_button = customtkinter.CTkCheckBox(master=self, text=text, onvalue="on",offvalue="off",command=self.toggle_highlighting)
+        self.highlight_button.grid(row=0, column=0)
+        self.colour_box = customtkinter.CTkComboBox(master=self,
+                                             values=["Green", "Red"],
+                                             command=self.set_colour)
+        self.colour_box.grid(row=0, column=1,padx=20)
 
+    def toggle_highlighting(self):
+        self.highlight = not self.highlight
+        print(self.highlight)
 
+    def set_colour(self,value):
+        self.colour = self.colour_box.get()
+        print(self.colour)
 class SearchBox(customtkinter.CTkFrame):
     def __init__(self, *args,columns,tree, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,16 +70,14 @@ class TreeViewTable(customtkinter.CTkFrame):
         self.entryPopup = None
         #[['StudentID', 'username', 'surname','firstName','gender','home','average','status','team']]
         self.sub_title_font = customtkinter.CTkFont(size=30)
-        self.highlight_gender = False
-        self.highlight_location = False
         if title is not None:
             title2 = customtkinter.CTkLabel(master=self, text="Results", font=self.sub_title_font)
             title2.grid(row=0, column=0, sticky='ns')
-            self.highlight_gender_button = customtkinter.CTkCheckBox(master=self, text="Highlight gender", onvalue="on", offvalue="off", command=self.toggle_highlighting_gender)
+            self.highlight_gender_button = highlighting(master=self, text="Highlight gender")
             self.highlight_gender_button.grid(row=3, column=0)
-            self.highlight_location_button = customtkinter.CTkCheckBox(master=self, text="Highlight origin", onvalue="on", offvalue="off", command=self.toggle_highlighting_location)
+            self.highlight_location_button = highlighting(master=self, text="Highlight origin")
             self.highlight_location_button.grid(row=4, column=0)
-            file = customtkinter.CTkButton(master=self, text="save results as csv", command=self.file_explorer_saving)
+            file = customtkinter.CTkButton(master=self, text="save results", command=self.file_explorer_saving)
             file.grid(row=5, column=0)
 
         self.columns = items[0]
@@ -102,13 +117,6 @@ class TreeViewTable(customtkinter.CTkFrame):
 
         self.tree.grid(row=2, column=0, sticky='nsew')
 
-    def toggle_highlighting_gender(self):
-        self.highlight_gender = not self.highlight_gender
-        print(self.highlight_gender)
-
-    def toggle_highlighting_location(self):
-        self.highlight_location = not self.highlight_location
-        print(self.highlight_location)
 
 
     def file_explorer_saving(self):
@@ -119,7 +127,7 @@ class TreeViewTable(customtkinter.CTkFrame):
             dict_writer = csv.DictWriter(output_file, keys)  # type: ignore
             dict_writer.writeheader()
             dict_writer.writerows(self.items_store)  # type: ignore
-        if self.highlight_location or  self.highlight_gender:
+        if self.highlight_gender_button.highlight or  self.highlight_location_button.highlight:
                 workbook = Workbook(file[:-4] + '.xlsx')
                 worksheet = workbook.add_worksheet()
                 format1 = workbook.add_format({'bg_color': '#FFC7CE','font_color': '#9C0006'})
@@ -130,16 +138,28 @@ class TreeViewTable(customtkinter.CTkFrame):
                     for r, row in enumerate(reader):
                         for c, col in enumerate(row):
                             worksheet.write(r, c, col)
-                if self.highlight_location:
-                    worksheet.conditional_format('F1:F1000', {'type': 'cell',
-                                             'criteria': '==',
-                                             'value': '"O"',
-                                             'format': format1})
-                if self.highlight_gender:
-                    worksheet.conditional_format('E1:E1000', {'type': 'cell',
-                                                              'criteria': '==',
-                                                              'value': '"F"',
-                                                              'format': format2})
+                if self.highlight_location_button.highlight:
+                    if self.highlight_location_button.colour == "Red":
+                        worksheet.conditional_format('F1:F1000', {'type': 'cell',
+                                                 'criteria': '==',
+                                                 'value': '"O"',
+                                                 'format': format1})
+                    else:
+                        worksheet.conditional_format('F1:F1000', {'type': 'cell',
+                                                                  'criteria': '==',
+                                                                  'value': '"O"',
+                                                                  'format': format2})
+                if self.highlight_gender_button.highlight:
+                    if self.highlight_gender_button.colour == "Red":
+                        worksheet.conditional_format('E1:E1000', {'type': 'cell',
+                                                                  'criteria': '==',
+                                                                  'value': '"F"',
+                                                                  'format': format1})
+                    else:
+                        worksheet.conditional_format('E1:E1000', {'type': 'cell',
+                                                                  'criteria': '==',
+                                                                  'value': '"F"',
+                                                                  'format': format2})
                 workbook.close()
                 os.remove(file)
 
