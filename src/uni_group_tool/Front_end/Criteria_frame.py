@@ -22,7 +22,7 @@ class CriteriaFrame(customtkinter.CTkFrame):
         self.type_to_make = type_to_make
         if type_to_make[0] == "diversity":
             if type_to_make[1] == "home":
-                temp_text = "location"
+                temp_text = "origin"
             else:
                 temp_text = type_to_make[1]
             self.checkbox = customtkinter.CTkCheckBox(master=self, text=temp_text, onvalue="on", offvalue="off",
@@ -30,8 +30,8 @@ class CriteriaFrame(customtkinter.CTkFrame):
             self.checkbox.grid(row=0, column=0, padx=10, pady=10)
             if temp_text == "average":
                 CreateToolTip(self.checkbox,"This will attempt to diversify the students by their average score")
-            if temp_text == "location":
-                CreateToolTip(self.checkbox,"This will attempt to diversify the students by their location.\n for example it will try to mix students that are working online with students that are working on campus")
+            if temp_text == "origin":
+                CreateToolTip(self.checkbox,"This will attempt to diversify the students by their origin.\n for example it will try to mix students that are from different origins")
             if temp_text == "gender":
                 CreateToolTip(self.checkbox,"This will attempt to diversify the students by their gender score\n for example it will try to mix students that are different genders together ")
             self.label = customtkinter.CTkLabel(master=self,
@@ -45,11 +45,13 @@ class CriteriaFrame(customtkinter.CTkFrame):
             self.priority.grid(row=0, column=2, padx=10, pady=10)
         if type_to_make[0] == "types_together":
             if type_to_make[1][1] == "Home":
-                temp_text = "Working on campus"
+                temp_text = "       From the UK"
             elif type_to_make[1][1] == "Online":
-                temp_text = "Working Online"
-            else:
-                temp_text = type_to_make[1][1]
+                temp_text = "Not from the UK"
+            elif type_to_make[1][1] == "Male":
+                temp_text = "                    Male"
+            elif type_to_make[1][1] == "Female":
+                temp_text = "                Female"
             self.label1 = customtkinter.CTkLabel(master=self,
                                                  text=temp_text,
                                                  width=40,
@@ -60,14 +62,14 @@ class CriteriaFrame(customtkinter.CTkFrame):
                                                       values=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
 
             self.combobox.grid(row=0, column=1, padx=10, pady=10)
-            if temp_text == "Male":
+            if temp_text == "                    Male":
                 CreateToolTip(self.label1, "This will attempt to group male students together\n This will try to enforce that at least N male students are together in a group ")
-            if temp_text == "Female":
+            if temp_text == "                Female":
                 CreateToolTip(self.label1, "This will attempt to group Female students together\n This will try to enforce that at least N Female students are together in a group ")
-            if temp_text == "Working on campus":
-                CreateToolTip(self.label1, "This will attempt to group students that are working on campus together\n This will try to enforce that at least N students on campus are together in a group")
-            if temp_text == "Working Online":
-                CreateToolTip(self.label1, "This will attempt to group students that are working Online together\n This will try to enforce that at least N students that are working online in a group ")
+            if temp_text == "       From the UK":
+                CreateToolTip(self.label1, "This will attempt to group students that are from the Uk together\n This will try to enforce that at least N students that are from the Uk together in a group")
+            if temp_text == "Not from the UK":
+                CreateToolTip(self.label1, "This will attempt to group students that are not from the Uk together\n This will try to enforce that at least N students that are not from the Uk in a group ")
             self.label2 = customtkinter.CTkLabel(master=self,
                                                  text="Priority",
                                                  width=40,
@@ -108,7 +110,8 @@ class CriteriaFrame(customtkinter.CTkFrame):
         else:
             self.criteria_data.set_min_group_size_or_amount_of_groups(False)
     def update_set_size_of_teams(self, data):
-        self.criteria_data.set_size_of_teams(self.value.get())
+        if self.value.get().isnumeric():
+            self.criteria_data.set_size_of_teams(self.value.get())
 
     def update_criteria_diversity(self):
         if self.checkbox.get() == "on":
@@ -120,7 +123,8 @@ class CriteriaFrame(customtkinter.CTkFrame):
         self.criteria_data.set_diversity(self.type_to_make[1])
 
     def update_criteria_together(self, data):
-        self.criteria_data.set_should_be_together(self.type_to_make[1][0], self.type_to_make[1][1], self.combobox.get())
+        if self.combobox.get().isnumeric():
+            self.criteria_data.set_should_be_together(self.type_to_make[1][0], self.type_to_make[1][1], self.combobox.get())
     # def add_first_box(self, data):
     #     if self.combobox.get() == "diversity":
     #         print("diversity", self.combobox3)

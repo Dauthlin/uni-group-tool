@@ -127,41 +127,49 @@ class TreeViewTable(customtkinter.CTkFrame):
             dict_writer = csv.DictWriter(output_file, keys)  # type: ignore
             dict_writer.writeheader()
             dict_writer.writerows(self.items_store)  # type: ignore
-        if self.highlight_gender_button.highlight or  self.highlight_location_button.highlight:
-                workbook = Workbook(file[:-4] + '.xlsx')
-                worksheet = workbook.add_worksheet()
-                format1 = workbook.add_format({'bg_color': '#FFC7CE','font_color': '#9C0006'})
-                format2 = workbook.add_format({'bg_color': '#C6EFCE','font_color': '#006100'})
 
-                with open(file, 'rt', encoding='utf8') as f:
-                    reader = csv.reader(f)
-                    for r, row in enumerate(reader):
-                        for c, col in enumerate(row):
-                            worksheet.write(r, c, col)
-                if self.highlight_location_button.highlight:
-                    if self.highlight_location_button.colour == "Red":
-                        worksheet.conditional_format('F1:F1000', {'type': 'cell',
-                                                 'criteria': '==',
-                                                 'value': '"O"',
-                                                 'format': format1})
-                    else:
-                        worksheet.conditional_format('F1:F1000', {'type': 'cell',
-                                                                  'criteria': '==',
-                                                                  'value': '"O"',
-                                                                  'format': format2})
-                if self.highlight_gender_button.highlight:
-                    if self.highlight_gender_button.colour == "Red":
-                        worksheet.conditional_format('E1:E1000', {'type': 'cell',
-                                                                  'criteria': '==',
-                                                                  'value': '"F"',
-                                                                  'format': format1})
-                    else:
-                        worksheet.conditional_format('E1:E1000', {'type': 'cell',
-                                                                  'criteria': '==',
-                                                                  'value': '"F"',
-                                                                  'format': format2})
-                workbook.close()
-                os.remove(file)
+        workbook = Workbook(file[:-4] + '.xlsx')
+        worksheet = workbook.add_worksheet()
+        format1 = workbook.add_format({'bg_color': '#FFC7CE','font_color': '#9C0006'})
+        format2 = workbook.add_format({'bg_color': '#C6EFCE','font_color': '#006100'})
+        format3 = workbook.add_format({'bg_color': '#e0dcdc', 'font_color': '#000000'})
+
+        with open(file, 'rt', encoding='utf8') as f:
+            reader = csv.reader(f)
+            for r, row in enumerate(reader):
+                for c, col in enumerate(row):
+                    worksheet.write(r, c, col)
+
+
+
+        if self.highlight_location_button.highlight:
+            if self.highlight_location_button.colour == "Red":
+                worksheet.conditional_format('F1:F1000', {'type': 'cell',
+                                         'criteria': '==',
+                                         'value': '"O"',
+                                         'format': format1})
+            else:
+                worksheet.conditional_format('F1:F1000', {'type': 'cell',
+                                                          'criteria': '==',
+                                                          'value': '"O"',
+                                                          'format': format2})
+        if self.highlight_gender_button.highlight:
+            if self.highlight_gender_button.colour == "Red":
+                worksheet.conditional_format('E1:E1000', {'type': 'cell',
+                                                          'criteria': '==',
+                                                          'value': '"F"',
+                                                          'format': format1})
+            else:
+                worksheet.conditional_format('E1:E1000', {'type': 'cell',
+                                                          'criteria': '==',
+                                                          'value': '"F"',
+                                                          'format': format2})
+
+        worksheet.conditional_format('A1:I1000', {'type': 'formula',
+                                                  'criteria': '=ISODD($H1)',
+                                                  'format': format3})
+        workbook.close()
+        os.remove(file)
 
     def update_table(self,items):
         self.items_store = copy.deepcopy(items)

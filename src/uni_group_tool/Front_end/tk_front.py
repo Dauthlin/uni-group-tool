@@ -88,6 +88,9 @@ class App_front(customtkinter.CTk):
 
     async def run_event(self):
         self.button.configure(state="disabled")
+        self.groups.update_set_size_of_teams("data")
+        for i in  self.criteria_together:
+            i.update_criteria_together("data")
         specific_teams = []
         for line in self.table.tree.get_children():
             if self.table.tree.item(line)['values'][2] != "":
@@ -201,7 +204,7 @@ class App_front(customtkinter.CTk):
             CriteriaFrame(self, type_to_make=("diversity", "home"), criteria_data=self.criteria_data, all_data=self.all_data),
             CriteriaFrame(self, type_to_make=("diversity", "gender"), criteria_data=self.criteria_data, all_data=self.all_data)]
         for i in range(self.row_count, self.row_count + len(self.criteria_diversity)):
-            self.criteria_diversity[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
+            self.criteria_diversity[i - self.row_count].pack(side=TOP,pady=0)
 
 
         # subtitle = customtkinter.CTkLabel(master=self, text="Types that should be together", font=self.sub_sub_title_font)
@@ -222,7 +225,7 @@ class App_front(customtkinter.CTk):
                                                  criteria_data=self.criteria_data, all_data=self.all_data)]
 
         for i in range(self.row_count, self.row_count + len(self.criteria_together)):
-            self.criteria_together[i - self.row_count].pack(side=TOP,pady=self.pad_ammount)
+            self.criteria_together[i - self.row_count].pack(side=TOP,pady=0)
         self.row_count_marker = self.row_count
 
 
