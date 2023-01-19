@@ -24,12 +24,13 @@ if __name__ == "__main__":
 
         for i in run(criteria, size_of_teams, shuffle, weights, data_path, False, saving,
                      min_group_size_or_amount_of_groups):
-            if isinstance(i, int):
+            if isinstance(i[0], int):
                 with open(result_path, 'w', encoding='utf-8') as f:
-                    json.dump({"loop": i}, f, ensure_ascii=False, indent=4)
+                    # json.dump({"loop": i[0]}, f, ensure_ascii=False, indent=4)
+                    json.dump({"loop": i[0], "current": groups_to_csv(i[1])}, f, ensure_ascii=False, indent=4)
             else:
                 with open(result_path, 'w', encoding='utf-8') as f:
-                    json.dump({"answer": groups_to_csv(i)}, f, ensure_ascii=False, indent=4)
+                    json.dump({"answer": groups_to_csv(i[0])}, f, ensure_ascii=False, indent=4)
 
     else:
         # f = open("demofile1.txt", "a")

@@ -38,14 +38,17 @@ class App_front(customtkinter.CTk):
                 data = self.loop_count
                 #print(data)
                 if data.get("loop") is not None:
+                    self.get_current.configure(state="enabled")
                     self.progressbar.start()
                     print(data)
                 elif data.get("answer") is not None:
                     self.table_results.update_table(data.get("answer"))
+                    self.get_current.configure(state="disabled")
                     self.loop_count = json.loads('{"not started":0}')
                     self.progressbar.stop()
                     self.progressbar.set(0)
                 else:
+                    self.get_current.configure(state="disabled")
                     self.progressbar.stop()
                     self.progressbar.set(0)
                 #self.progres_label.configure(text=self.loop_count)
@@ -58,10 +61,10 @@ class App_front(customtkinter.CTk):
         async for path in self.execute(self.all_data):
             self.loop_count = path
 
-
+    def early_update_table(self):
+        self.table_results.update_table(self.loop_count.get("current"))
 
     async def execute(self,data):
-
         dirpath = tempfile.mkdtemp()
         print(dirpath)
         data.set_result_path(os.path.join(dirpath ,'results.json'))
@@ -243,6 +246,9 @@ class App_front(customtkinter.CTk):
         self.button = customtkinter.CTkButton(master=self, text="Run", command= lambda: self.loop.create_task(self.run_event()))
         self.button.configure(state="disabled")
         self.button.pack(side=TOP, pady=self.pad_ammount)
+        self.get_current = customtkinter.CTkButton(master=self, text="Get current results", command= self.early_update_table)
+        self.get_current.configure(state="disabled")
+        self.get_current.pack(side=TOP, pady=self.pad_ammount)
 
 
 
