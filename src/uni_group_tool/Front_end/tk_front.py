@@ -1,13 +1,29 @@
 import copy
 import os
 from tkinter.filedialog import askopenfilename
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
 import customtkinter
 from uni_group_tool.main import run, get_csv, get_csv_table_students, groups_to_csv
-from .Criteria_frame import CriteriaFrame
+from .Criteria_frame import CriteriaFrame , CreateToolTip
 from .Criteria_storage import CriteriaStorage
 from .Treeview_table import TreeViewTable
 from .all_data_to_send import AllDataToSend
 from tkinter import Tk, Label, X, Frame, Y, TOP,LEFT, BOTH,RIGHT,BOTTOM,N,NE
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+from matplotlib import style
+style.use('ggplot')
+f = Figure(figsize=(5, 4), dpi=100)
+f.suptitle('Graph to show the fitness of the best collection of groups', fontsize=15)
+
+a = f.add_subplot(111)
+
 import asyncio
 import subprocess
 import sys
@@ -31,16 +47,24 @@ class App_front(customtkinter.CTk):
 
 
     async def show(self):
+        last = None
         while True:
             try:
                 #self.label["text"] = self.animation
                 #self.animation = self.animation[1:] + self.animation[0]
                 data = self.loop_count
+                ani = animation.FuncAnimation(f, self.animate, interval=1200)
                 #print(data)
                 if data.get("loop") is not None:
                     self.get_current.configure(state="enabled")
                     self.progressbar.start()
-                    print(data)
+                    #print(data.get("loop"),data.get("score"))
+                    self.score += data.get("score")
+                    if data.get("loop") != last:
+                        #self.positions.append((data.get("loop"),self.score))
+                        self.xar.append(data.get("loop"))
+                        self.yar.append(self.score)
+                    last = data.get("loop")
                 elif data.get("answer") is not None:
                     self.table_results.update_table(data.get("answer"))
                     self.get_current.configure(state="disabled")
@@ -56,6 +80,24 @@ class App_front(customtkinter.CTk):
                 await asyncio.sleep(1/30)
             except Exception:
                 return
+
+    def create_toplevel(self):
+        window = customtkinter.CTkToplevel(self)
+        window.geometry("625x500")
+        window.title("Fitness graph")
+        # create label on CTkToplevel window
+        canvas = FigureCanvasTkAgg(f, window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+    def animate(self,i):
+        a.clear()
+        #a.set_ylabel("Average score")
+        a.set_ylabel("Fitness")
+        a.set_xlabel("current loop")
+
+        a.plot(self.xar, self.yar)
+
 
     async def Run_program(self):
         async for path in self.execute(self.all_data):
@@ -141,6 +183,9 @@ class App_front(customtkinter.CTk):
         #self.scroll_bar.config(command=self.table.yview)
     def __init__(self, loop):
         super().__init__()
+        self.score = 0
+        self.xar = []
+        self.yar = []
         self.loop = loop
         self.loop_count = json.loads('{"not started":0}')
         self.all_data = AllDataToSend()
@@ -176,6 +221,7 @@ class App_front(customtkinter.CTk):
                                      "surname is the students surname\n"
                                      "firstname is the students first name\n"
                                      "gender is the students gender M or F\n"
+                                     "home is the students origin, it can be either H for students from the UK or O for international students\n"
                                      "average is the students average mark out of 100\n"
                                      "team should be left blank or can contain a predetermined team that the student should be in\n"
                                      "status can be left blank")
@@ -249,7 +295,8 @@ class App_front(customtkinter.CTk):
         self.get_current = customtkinter.CTkButton(master=self, text="Get current results", command= self.early_update_table)
         self.get_current.configure(state="disabled")
         self.get_current.pack(side=TOP, pady=self.pad_ammount)
-
+        self.dialog_button = customtkinter.CTkButton(self, text="Show fitness graph", command=self.create_toplevel)
+        self.dialog_button.pack(side=TOP, pady=self.pad_ammount)
 
 
 def run_front_end():

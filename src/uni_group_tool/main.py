@@ -143,9 +143,9 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
                 score1 += (temp[teams1][i] / temp[teams2][j]) * weight
     # print(score1, score2)
     if score1 > score2:
-        return True, teams1
+        return True, teams1, score1 - score2
     else:
-        return False, teams2
+        return False, teams2, score2 - score1
 
 
 def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple[int, int], criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
@@ -263,13 +263,15 @@ def select(neighbours: List[tuple[Groups, tuple[int, int, int, int]]], weights):
             comparison = compare_fitness(group[0], best[0], weights)
             if comparison[0]:
                 best = group
+
     return best
 
 
 def test(group_to_test, current_best_group, current_time, time_when_best_was_found, weights):
-    if compare_fitness(group_to_test, current_best_group, weights)[0]:
-        return group_to_test, current_time
-    return current_best_group, time_when_best_was_found
+    comparison = compare_fitness(group_to_test, current_best_group, weights)
+    if comparison[0]:
+        return group_to_test, current_time, comparison[2]
+    return current_best_group, time_when_best_was_found, 0
 
 
 def update(best_neighbour, current_time):
@@ -320,11 +322,11 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,
     while not stop(current_time, time_when_best_was_found):
         neighbours = generate_multiprocessing(current_all_team, best_team, current_time, criteria, weights)
         best_neighbour = select(neighbours, weights)
-        best_team, time_when_best_was_found = test(best_neighbour[0], best_team, current_time,
+        best_team, time_when_best_was_found, score = test(best_neighbour[0], best_team, current_time,
                                                    time_when_best_was_found, weights)
 
         current_all_team, current_time = update(best_neighbour, current_time)
-        yield current_time, best_team
+        yield current_time, best_team, score
         if debugging:
             print("best     ", best_team.fitness.get_all(), time_when_best_was_found, )
             print("neighbour", best_neighbour[0].fitness.get_all(), "group1", best_neighbour[1], "group2",
@@ -333,7 +335,7 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,
             print("")
     if saving:
         save_csv(groups_to_csv(best_team))
-    yield [best_team]
+    yield best_team, score
 
 
 # Press the green button in the gutter to run the script.
