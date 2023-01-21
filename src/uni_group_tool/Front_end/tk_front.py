@@ -19,10 +19,13 @@ from matplotlib.figure import Figure
 import matplotlib.animation as animation
 from matplotlib import style
 style.use('ggplot')
-f = Figure(figsize=(5, 4), dpi=100)
-f.suptitle('Graph to show the fitness of the best collection of groups', fontsize=15)
+fig = Figure(figsize=(5, 4), dpi=100)
+fig.suptitle('Fitness of the best collection of groups', fontsize=15)
 
-a = f.add_subplot(111)
+sub_plot = fig.add_subplot(111)
+sub_plot.set_ylabel("Fitness")
+sub_plot.set_xlabel("current loop")
+
 
 import asyncio
 import subprocess
@@ -51,12 +54,16 @@ class App_front(customtkinter.CTk):
         while True:
             try:
                 #self.label["text"] = self.animation
-                #self.animation = self.animation[1:] + self.animation[0]
                 data = self.loop_count
-                ani = animation.FuncAnimation(f, self.animate, interval=1200)
+                #
                 #print(data)
+                if self.go:
+                    self.progressbar.start()
                 if data.get("loop") is not None:
+
+
                     self.get_current.configure(state="enabled")
+                    self.dialog_button.configure(state="enabled")
                     self.progressbar.start()
                     #print(data.get("loop"),data.get("score"))
                     self.score += data.get("score")
@@ -68,11 +75,14 @@ class App_front(customtkinter.CTk):
                 elif data.get("answer") is not None:
                     self.table_results.update_table(data.get("answer"))
                     self.get_current.configure(state="disabled")
+                    self.dialog_button.configure(state="disabled")
                     self.loop_count = json.loads('{"not started":0}')
                     self.progressbar.stop()
                     self.progressbar.set(0)
+                    self.go = False
                 else:
                     self.get_current.configure(state="disabled")
+                    self.dialog_button.configure(state="disabled")
                     self.progressbar.stop()
                     self.progressbar.set(0)
                 #self.progres_label.configure(text=self.loop_count)
@@ -86,17 +96,16 @@ class App_front(customtkinter.CTk):
         window.geometry("625x500")
         window.title("Fitness graph")
         # create label on CTkToplevel window
-        canvas = FigureCanvasTkAgg(f, window)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        self.canvas_animation = FigureCanvasTkAgg(fig, window)
+        self.canvas_animation.draw()
+        self.canvas_animation.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        self.ani = animation.FuncAnimation(fig, self.animate, interval=1000)
 
     def animate(self,i):
-        a.clear()
-        #a.set_ylabel("Average score")
-        a.set_ylabel("Fitness")
-        a.set_xlabel("current loop")
-
-        a.plot(self.xar, self.yar)
+        sub_plot.clear()
+        sub_plot.set_ylabel("Fitness")
+        sub_plot.set_xlabel("current loop")
+        sub_plot.plot(self.xar, self.yar)
 
 
     async def Run_program(self):
@@ -133,6 +142,9 @@ class App_front(customtkinter.CTk):
 
     async def run_event(self):
         self.button.configure(state="disabled")
+        self.go = True
+        self.xar = [1]
+        self.yar = [0]
         self.groups.update_set_size_of_teams("data")
         for i in  self.criteria_together:
             i.update_criteria_together("data")
@@ -183,6 +195,8 @@ class App_front(customtkinter.CTk):
         #self.scroll_bar.config(command=self.table.yview)
     def __init__(self, loop):
         super().__init__()
+        self.ani = None
+        self.go = False
         self.score = 0
         self.xar = []
         self.yar = []
@@ -296,7 +310,10 @@ class App_front(customtkinter.CTk):
         self.get_current.configure(state="disabled")
         self.get_current.pack(side=TOP, pady=self.pad_ammount)
         self.dialog_button = customtkinter.CTkButton(self, text="Show fitness graph", command=self.create_toplevel)
+        self.dialog_button.configure(state="disabled")
         self.dialog_button.pack(side=TOP, pady=self.pad_ammount)
+        #CreateToolTip(self.dialog_button, "If no data is being displayed in the graph please open and close the box,\n"
+        #                                  " It can take a couple of seconds after running the program a second datapoint to be generated,\n having this box open can cause other elements of the application to respond slower")
 
 
 def run_front_end():
@@ -304,6 +321,7 @@ def run_front_end():
 
 
 if __name__ == "__main__":
+
     run_front_end()
 
 
