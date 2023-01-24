@@ -77,7 +77,7 @@ class TreeViewTable(customtkinter.CTkFrame):
             self.highlight_gender_button.grid(row=3, column=0)
             self.highlight_location_button = highlighting(master=self, text="Highlight origin")
             self.highlight_location_button.grid(row=4, column=0)
-            file = customtkinter.CTkButton(master=self, text="save results", command=self.file_explorer_saving)
+            file = customtkinter.CTkButton(master=self, text="save results to excel", command=self.file_explorer_saving)
             file.grid(row=5, column=0)
 
         self.columns = items[0]
