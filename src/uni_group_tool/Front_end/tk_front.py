@@ -205,7 +205,7 @@ class App_front(customtkinter.CTk):
         self.all_data = AllDataToSend()
         self.framed_table = None
         self.data = None
-        self.pad_ammount = 3
+        self.pad_ammount = 1
 
 
         #self.tk.call('tk','scaling',5.0)
@@ -223,7 +223,7 @@ class App_front(customtkinter.CTk):
         title.pack(side=TOP,pady=self.pad_ammount)
 
 
-        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=42)
+        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=39)
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
         self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
