@@ -1,7 +1,18 @@
 class student:
     import copy
 
-    def __init__(self, studentID, username, surname, firstName, gender, home, average, team, status):
+    def __init__(
+        self,
+        studentID,
+        username,
+        surname,
+        firstName,
+        gender,
+        home,
+        average,
+        team,
+        status,
+    ):
         self.studentid = studentID
         self.username = username
         self.surname = surname

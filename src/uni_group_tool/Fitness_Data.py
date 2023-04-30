@@ -1,7 +1,10 @@
 class FitnessData:
     def __init__(self):
         self.diversity = {"gender": None, "home": None, "average": None}
-        self.should_be_together = {"gender": {"M": None, "F": None}, "home": {"H": None, "O": None}}
+        self.should_be_together = {
+            "gender": {"M": None, "F": None},
+            "home": {"H": None, "O": None},
+        }
         self.has_required_students = None
 
     def get_all(self):
@@ -14,16 +17,16 @@ class FitnessData:
         return self.diversity[key]
 
     def set_diversity(self, key: str, value: int):
-        self.diversity[key] = value     # type: ignore
+        self.diversity[key] = value  # type: ignore
 
     def get_should_be_together(self, outer_key: str, inner_key: str) -> int | None:
         return self.should_be_together[outer_key][inner_key]
 
     def set_should_be_together(self, outer_key: str, inner_key: str, value: int):
-        self.should_be_together[outer_key][inner_key] = value    # type: ignore
+        self.should_be_together[outer_key][inner_key] = value  # type: ignore
 
     def get_has_required_students(self) -> int | None:
         return self.has_required_students
 
     def set_has_required_students(self, value: int):
-        self.has_required_students = value     # type: ignore
+        self.has_required_students = value  # type: ignore

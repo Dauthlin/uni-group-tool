@@ -41,13 +41,16 @@ class App_new(customtkinter.CTk):
         # app.tk.call('tk', 'scaling', factor)
         # app.place(height=int(r2_height), width = r2_width)
 
-class MyApp(App):
- size_x = NumericProperty(0)
- size_y = NumericProperty(0)
- def on_start(self):
-     window_sizes=Window.size
-     self.size_x , self.size_y = window_sizes
-     print(self.size_x, self.size_y)
 
-if __name__ == '__main__':
+class MyApp(App):
+    size_x = NumericProperty(0)
+    size_y = NumericProperty(0)
+
+    def on_start(self):
+        window_sizes = Window.size
+        self.size_x, self.size_y = window_sizes
+        print(self.size_x, self.size_y)
+
+
+if __name__ == "__main__":
     MyApp().run()

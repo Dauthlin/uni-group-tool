@@ -2,6 +2,7 @@ import customtkinter
 import asyncio
 import time
 
+
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -16,7 +17,6 @@ class App(customtkinter.CTk):
         print("button pressed")
 
 
-
 async def say_after():
     while True:
         await asyncio.sleep(1)
@@ -25,11 +25,9 @@ async def say_after():
 
 async def main():
     app = App()
-    task1 = asyncio.create_task(
-        app.mainloop())
+    task1 = asyncio.create_task(app.mainloop())
 
-    task2 = asyncio.create_task(
-        say_after())
+    task2 = asyncio.create_task(say_after())
 
     # print(f"started at {time.strftime('%X')}")
 
@@ -42,6 +40,3 @@ async def main():
 if __name__ == "__main__":
     async_loop = asyncio.get_event_loop()
     asyncio.run(main())
-
-
-

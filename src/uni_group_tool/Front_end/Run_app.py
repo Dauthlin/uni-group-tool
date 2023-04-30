@@ -4,6 +4,7 @@ import ast
 
 from uni_group_tool.main import groups_to_csv, run
 
+
 def run_main():
     # Opening JSON file
 
@@ -23,16 +24,34 @@ def run_main():
     # f = open("C:\Users\Michael\OneDrive\uni\project\coding\output\data\demofile2.txt", "a")
     # f.write("Now the file has more content!")
     # f.close()
-    for i in run(criteria, size_of_teams, shuffle, weights, data_path, False, saving,
-                 min_group_size_or_amount_of_groups):
+    for i in run(
+        criteria,
+        size_of_teams,
+        shuffle,
+        weights,
+        data_path,
+        False,
+        saving,
+        min_group_size_or_amount_of_groups,
+    ):
         if isinstance(i[0], int):
-            with open(result_path, 'w', encoding='utf-8') as f:
-                #json.dump({"loop": i[0]}, f, ensure_ascii=False, indent=4)
-                json.dump({"loop": i[0],"current":groups_to_csv(i[1]),"score":i[2]}, f, ensure_ascii=False, indent=4)
+            with open(result_path, "w", encoding="utf-8") as f:
+                # json.dump({"loop": i[0]}, f, ensure_ascii=False, indent=4)
+                json.dump(
+                    {"loop": i[0], "current": groups_to_csv(i[1]), "score": i[2]},
+                    f,
+                    ensure_ascii=False,
+                    indent=4,
+                )
         else:
-            with open(result_path, 'w', encoding='utf-8') as f:
-                json.dump({"answer": groups_to_csv(i[0]),"score":i[1]}, f, ensure_ascii=False, indent=4)
-            #print(json.dumps({"answer": groups_to_csv(i)}))
+            with open(result_path, "w", encoding="utf-8") as f:
+                json.dump(
+                    {"answer": groups_to_csv(i[0]), "score": i[1]},
+                    f,
+                    ensure_ascii=False,
+                    indent=4,
+                )
+            # print(json.dumps({"answer": groups_to_csv(i)}))
 
     # with open('test_data/results.json', 'w', encoding='utf-8') as f:
     #     json.dump(data, f, ensure_ascii=False, indent=4)

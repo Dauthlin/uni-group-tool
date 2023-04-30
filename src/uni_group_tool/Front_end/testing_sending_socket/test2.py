@@ -5,6 +5,7 @@ import ast
 
 current_response = {}
 
+
 async def test(ws):
     global current_response
     print("waiting")
@@ -41,28 +42,28 @@ async def test(ws):
 
         current_response = response2
 
+
 async def say_after():
     while current_response.get("complete") is not True:
         await asyncio.sleep(1)
         print(current_response.get("loop"))
 
+
 async def main():
-    #ws = websocket.WebSocketApp("ws://127.0.0.1:5000/run_program")
+    # ws = websocket.WebSocketApp("ws://127.0.0.1:5000/run_program")
     async with websockets.connect("ws://127.0.0.1:5000/run_program") as ws:
-     task1 = asyncio.create_task(
-        test(ws))
+        task1 = asyncio.create_task(test(ws))
 
-     task2 = asyncio.create_task(
-        say_after())
+        task2 = asyncio.create_task(say_after())
 
-     print(f"started at {time.strftime('%X')}")
+        print(f"started at {time.strftime('%X')}")
 
-    # Wait until both tasks are completed (should take
-    # around 2 seconds.)
-     await task1
-     await task2
-    #await asyncio.gather(task1, task2)
-     print(f"finished at {time.strftime('%X')}")
+        # Wait until both tasks are completed (should take
+        # around 2 seconds.)
+        await task1
+        await task2
+        # await asyncio.gather(task1, task2)
+        print(f"finished at {time.strftime('%X')}")
 
 
 asyncio.run(main())

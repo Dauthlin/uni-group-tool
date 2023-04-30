@@ -7,7 +7,7 @@ app = Flask(__name__)
 sock = Sock(app)
 
 
-@sock.route('/run_program')
+@sock.route("/run_program")
 def run_program(sock):
     while True:
         data = None
@@ -23,13 +23,16 @@ def run_program(sock):
         saving = data["saving"]
         print(data)
 
-        for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving):
+        for i in run(
+            criteria, size_of_teams, shuffle, weights, data_path, debugging, saving
+        ):
             print(i)
             if isinstance(i, int):
-                sock.send({"loop":i})
+                sock.send({"loop": i})
             else:
-                sock.send({"answer":groups_to_csv(i)})
+                sock.send({"answer": groups_to_csv(i)})
         sock.send({"complete": True})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")

@@ -39,18 +39,36 @@ class Groups:
         result = []
         for single_group in self.groups:
             if type_of_fitness[0] == "diversity":  # ("diversity", "average")
-                result.append((single_group, single_group.get_fitness().get_diversity(type_of_fitness[1])))
-            if type_of_fitness[0] == "specific_teams":  # [("208026943", 3), ("208063956", 3), ("207069131", 4)]
-                result.append((single_group, single_group.get_fitness().get_has_required_students()))
-            if type_of_fitness[0] == "amount_to_be_together":  # ("minimum_of_type", "gender", "M")
                 result.append(
-                    (single_group,
-                     single_group.get_fitness().get_should_be_together(type_of_fitness[1], type_of_fitness[2])))
+                    (
+                        single_group,
+                        single_group.get_fitness().get_diversity(type_of_fitness[1]),
+                    )
+                )
+            if (
+                type_of_fitness[0] == "specific_teams"
+            ):  # [("208026943", 3), ("208063956", 3), ("207069131", 4)]
+                result.append(
+                    (
+                        single_group,
+                        single_group.get_fitness().get_has_required_students(),
+                    )
+                )
+            if (
+                type_of_fitness[0] == "amount_to_be_together"
+            ):  # ("minimum_of_type", "gender", "M")
+                result.append(
+                    (
+                        single_group,
+                        single_group.get_fitness().get_should_be_together(
+                            type_of_fitness[1], type_of_fitness[2]
+                        ),
+                    )
+                )
 
         return result
 
     def many_groups_fitness(self):
-
         def merge_dict(dict1, dict2):
             for key, val in dict1.items():
                 if type(val) == dict:
@@ -71,7 +89,9 @@ class Groups:
 
             return dict1
 
-        many_fitness = [single_group.get_fitness().get_all() for single_group in self.groups]
+        many_fitness = [
+            single_group.get_fitness().get_all() for single_group in self.groups
+        ]
         combined_dict = copy.deepcopy(many_fitness[0])
         for i in many_fitness[1:]:
             combined_dict = merge_dict(combined_dict, i)
@@ -89,18 +109,26 @@ class Groups:
             total = 0
             # each type in group in required minimum type
             if minimum_type == "gender":
-                in_group = [single_student.gender for single_student in single_group.get_students() if
-                            single_student.gender == which_type]
+                in_group = [
+                    single_student.gender
+                    for single_student in single_group.get_students()
+                    if single_student.gender == which_type
+                ]
             if minimum_type == "home":
-                in_group = [single_student.home for single_student in single_group.get_students() if
-                            single_student.home == which_type]
+                in_group = [
+                    single_student.home
+                    for single_student in single_group.get_students()
+                    if single_student.home == which_type
+                ]
             if len(in_group) == 0:
                 total += 1
             elif len(in_group) < minimum_number:
                 total += 0
             else:
                 total += 1
-            single_group.get_fitness().set_should_be_together(minimum_type, which_type, total)
+            single_group.get_fitness().set_should_be_together(
+                minimum_type, which_type, total
+            )
 
     def specific_teams(self, studentid_to_group_number_list: List[tuple[int, int]]):
         for single_group in self.groups:
@@ -109,7 +137,10 @@ class Groups:
                 # if student is meant to be in this group
                 if single_group.group_number == studentid_to_group_number[1]:
                     # get all student  ID's in the group
-                    ids_in_group = [single_student.studentid for single_student in single_group.get_students()]
+                    ids_in_group = [
+                        single_student.studentid
+                        for single_student in single_group.get_students()
+                    ]
                     # if the student is in the group +1 otherwise -1
                     if studentid_to_group_number[0] in ids_in_group:
                         total += 1
@@ -133,10 +164,16 @@ class Groups:
                         if type_of_diversity == "average":
                             total += abs(student1.average - student2.average)
                         if type_of_diversity == "home":
-                            total += abs(convert_to_number(student1.home) - convert_to_number(student2.home))
+                            total += abs(
+                                convert_to_number(student1.home)
+                                - convert_to_number(student2.home)
+                            )
                             # print(total,student1.username,convert_to_number(student1.home),student2.username,convert_to_number(student2.home))
                         if type_of_diversity == "gender":
-                            total += abs(convert_to_number(student1.gender) - convert_to_number(student2.gender))
+                            total += abs(
+                                convert_to_number(student1.gender)
+                                - convert_to_number(student2.gender)
+                            )
 
             single_group.get_fitness().set_diversity(type_of_diversity, total)
             # print(single_group.get_fitness().get_diversity(type_of_diversity))

@@ -7,20 +7,22 @@ from matplotlib.figure import Figure
 
 import customtkinter
 from uni_group_tool.main import run, get_csv, get_csv_table_students, groups_to_csv
-from .Criteria_frame import CriteriaFrame , CreateToolTip
+from .Criteria_frame import CriteriaFrame, CreateToolTip
 from .Criteria_storage import CriteriaStorage
 from .Treeview_table import TreeViewTable
 from .all_data_to_send import AllDataToSend
-from tkinter import Tk, Label, X, Frame, Y, TOP,LEFT, BOTH,RIGHT,BOTTOM,N,NE
+from tkinter import Tk, Label, X, Frame, Y, TOP, LEFT, BOTH, RIGHT, BOTTOM, N, NE
 import matplotlib
+
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
 from matplotlib import style
-style.use('ggplot')
+
+style.use("ggplot")
 fig = Figure(figsize=(5, 4), dpi=100)
-fig.suptitle('Fitness of the best collection of groups', fontsize=15)
+fig.suptitle("Fitness of the best collection of groups", fontsize=15)
 
 sub_plot = fig.add_subplot(111)
 sub_plot.set_ylabel("Fitness")
@@ -32,43 +34,37 @@ import subprocess
 import sys
 import json
 from .help_box_title import helpBox
-from.Run_app import run_main
+from .Run_app import run_main
 import tempfile
 import shutil
 from os.path import exists
+
+
 class App:
     async def exec(self):
         self.window = App_front(asyncio.get_event_loop())
         await self.window.show()
 
 
-
-
-
 class App_front(customtkinter.CTk):
-
-
-
     async def show(self):
         last = None
         while True:
             try:
-                #self.label["text"] = self.animation
+                # self.label["text"] = self.animation
                 data = self.loop_count
                 #
-                #print(data)
+                # print(data)
                 if self.go:
                     self.progressbar.start()
                 if data.get("loop") is not None:
-
-
                     self.get_current.configure(state="enabled")
                     self.dialog_button.configure(state="enabled")
                     self.progressbar.start()
-                    #print(data.get("loop"),data.get("score"))
+                    # print(data.get("loop"),data.get("score"))
                     self.score += data.get("score")
                     if data.get("loop") != last:
-                        #self.positions.append((data.get("loop"),self.score))
+                        # self.positions.append((data.get("loop"),self.score))
                         self.xar.append(data.get("loop"))
                         self.yar.append(self.score)
                     last = data.get("loop")
@@ -85,9 +81,9 @@ class App_front(customtkinter.CTk):
                     self.dialog_button.configure(state="disabled")
                     self.progressbar.stop()
                     self.progressbar.set(0)
-                #self.progres_label.configure(text=self.loop_count)
+                # self.progres_label.configure(text=self.loop_count)
                 self.update()
-                await asyncio.sleep(1/30)
+                await asyncio.sleep(1 / 30)
             except Exception:
                 return
 
@@ -101,12 +97,11 @@ class App_front(customtkinter.CTk):
         self.canvas_animation.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
         self.ani = animation.FuncAnimation(fig, self.animate, interval=1000)
 
-    def animate(self,i):
+    def animate(self, i):
         sub_plot.clear()
         sub_plot.set_ylabel("Fitness")
         sub_plot.set_xlabel("current loop")
         sub_plot.plot(self.xar, self.yar)
-
 
     async def Run_program(self):
         async for path in self.execute(self.all_data):
@@ -115,17 +110,24 @@ class App_front(customtkinter.CTk):
     def early_update_table(self):
         self.table_results.update_table(self.loop_count.get("current"))
 
-    async def execute(self,data):
+    async def execute(self, data):
         dirpath = tempfile.mkdtemp()
         print(dirpath)
-        data.set_result_path(os.path.join(dirpath ,'results.json'))
-        popen = subprocess.Popen([sys.executable, "src/uni_group_tool/Front_end/Run_app.py",json.dumps(data.get_all()),dirpath ],
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          stdin=subprocess.PIPE,
-                          universal_newlines=True)
+        data.set_result_path(os.path.join(dirpath, "results.json"))
+        popen = subprocess.Popen(
+            [
+                sys.executable,
+                "src/uni_group_tool/Front_end/Run_app.py",
+                json.dumps(data.get_all()),
+                dirpath,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            universal_newlines=True,
+        )
         while not exists(data.get_result_path()):
-            await asyncio.sleep(.1)
+            await asyncio.sleep(0.1)
         f = open(data.get_result_path())
         result = json.load(f)
         f.close()
@@ -136,9 +138,8 @@ class App_front(customtkinter.CTk):
             f.close()
             yield result
             await asyncio.sleep(1)
-        #popen.stdout.close()
+        # popen.stdout.close()
         shutil.rmtree(dirpath)
-
 
     async def run_event(self):
         self.button.configure(state="disabled")
@@ -146,40 +147,55 @@ class App_front(customtkinter.CTk):
         self.xar = [1]
         self.yar = [0]
         self.groups.update_set_size_of_teams("data")
-        for i in  self.criteria_together:
+        for i in self.criteria_together:
             i.update_criteria_together("data")
         specific_teams = []
         for line in self.table.tree.get_children():
-            if self.table.tree.item(line)['values'][2] != "":
-                specific_teams.append([str(self.table.tree.item(line)['values'][0]),self.table.tree.item(line)['values'][2]])
+            if self.table.tree.item(line)["values"][2] != "":
+                specific_teams.append(
+                    [
+                        str(self.table.tree.item(line)["values"][0]),
+                        self.table.tree.item(line)["values"][2],
+                    ]
+                )
         specific_teams = [specific_teams]
         self.criteria_data.set_specific_teams(specific_teams)
 
         criteria = copy.deepcopy(self.criteria_data.get_all())
-        criteria["amount_to_be_together"]["home"]['H'] = criteria["amount_to_be_together"]["home"]["Home"]
+        criteria["amount_to_be_together"]["home"]["H"] = criteria[
+            "amount_to_be_together"
+        ]["home"]["Home"]
         del criteria["amount_to_be_together"]["home"]["Home"]
-        criteria["amount_to_be_together"]["home"]['O'] = criteria["amount_to_be_together"]["home"]["Online"]
+        criteria["amount_to_be_together"]["home"]["O"] = criteria[
+            "amount_to_be_together"
+        ]["home"]["Online"]
         del criteria["amount_to_be_together"]["home"]["Online"]
-        criteria["amount_to_be_together"]["Gender"]["F"] = criteria["amount_to_be_together"]["Gender"]["Female"]
+        criteria["amount_to_be_together"]["Gender"]["F"] = criteria[
+            "amount_to_be_together"
+        ]["Gender"]["Female"]
         del criteria["amount_to_be_together"]["Gender"]["Female"]
-        criteria["amount_to_be_together"]["Gender"]["M"] = criteria["amount_to_be_together"]["Gender"]["Male"]
+        criteria["amount_to_be_together"]["Gender"]["M"] = criteria[
+            "amount_to_be_together"
+        ]["Gender"]["Male"]
         del criteria["amount_to_be_together"]["Gender"]["Male"]
-        criteria["amount_to_be_together"]["gender"] = criteria["amount_to_be_together"]["Gender"]
+        criteria["amount_to_be_together"]["gender"] = criteria["amount_to_be_together"][
+            "Gender"
+        ]
         del criteria["amount_to_be_together"]["Gender"]
 
-        diversity = criteria['diversity']
+        diversity = criteria["diversity"]
         store = []
         for i in diversity:
             if diversity[i]:
                 store.append(i)
-        criteria['diversity'] = store
-        amount_to_be_together = criteria['amount_to_be_together']
+        criteria["diversity"] = store
+        amount_to_be_together = criteria["amount_to_be_together"]
         store = []
         for i in amount_to_be_together:
             for j in amount_to_be_together[i]:
                 if amount_to_be_together[i][j] is not None:
-                    store.append([i,j,int(amount_to_be_together[i][j])])
-        criteria['amount_to_be_together'] = store
+                    store.append([i, j, int(amount_to_be_together[i][j])])
+        criteria["amount_to_be_together"] = store
         self.all_data.set_criteria(criteria)
         print(self.all_data.get_all())
         await self.Run_program()
@@ -192,7 +208,8 @@ class App_front(customtkinter.CTk):
         self.all_data.set_data_path(path)
         self.button.configure(state="enabled")
 
-        #self.scroll_bar.config(command=self.table.yview)
+        # self.scroll_bar.config(command=self.table.yview)
+
     def __init__(self, loop):
         super().__init__()
         self.ani = None
@@ -207,38 +224,64 @@ class App_front(customtkinter.CTk):
         self.data = None
         self.pad_ammount = 1
 
-
-        #self.tk.call('tk','scaling',5.0)
+        # self.tk.call('tk','scaling',5.0)
         self.title("Group creation tool")
-        #setting fonts
+        # setting fonts
         self.title_font = customtkinter.CTkFont(size=35)
         self.sub_title_font = customtkinter.CTkFont(size=30)
         self.sub_sub_title_font = customtkinter.CTkFont(size=20)
 
-
-        customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
+        customtkinter.set_appearance_mode(
+            "dark"
+        )  # Modes: system (default), light, dark
         self.criteria_data = CriteriaStorage()
         self.row_count = 0
-        title = customtkinter.CTkLabel(master=self, text="Group creation tool", font=self.title_font)
-        title.pack(side=TOP,pady=self.pad_ammount)
+        title = customtkinter.CTkLabel(
+            master=self, text="Group creation tool", font=self.title_font
+        )
+        title.pack(side=TOP, pady=self.pad_ammount)
 
-
-        self.table_results = TreeViewTable(self, items=[['StudentID', 'username', 'surname','firstName','gender','home','average','team','status']],title="results",row_size=75,height=39)
+        self.table_results = TreeViewTable(
+            self,
+            items=[
+                [
+                    "StudentID",
+                    "username",
+                    "surname",
+                    "firstName",
+                    "gender",
+                    "home",
+                    "average",
+                    "team",
+                    "status",
+                ]
+            ],
+            title="results",
+            row_size=75,
+            height=39,
+        )
         self.table_results.pack(side=RIGHT, anchor=NE, pady=self.pad_ammount)
         self.row_count += 1
-        self.file = customtkinter.CTkButton(master=self, text="Import Students file", command=self.file_explorer)
-        self.file.pack(side=TOP,pady=self.pad_ammount)
-        subtitle = helpBox(master=self, size=30, text="",button=True,
-                           help_text="This is a template csv file you can use to enter your students information.\n"
-                                     "StudentID is a string containing the students ID\n"
-                                     "username is the students username\n"
-                                     "surname is the students surname\n"
-                                     "firstname is the students first name\n"
-                                     "gender is the students gender M or F\n"
-                                     "home is the students origin, it can be either H for students from the UK or O for international students\n"
-                                     "average is the students average mark out of 100\n"
-                                     "team should be left blank or can contain a predetermined team that the student should be in\n"
-                                     "status can be left blank")
+        self.file = customtkinter.CTkButton(
+            master=self, text="Import Students file", command=self.file_explorer
+        )
+        self.file.pack(side=TOP, pady=self.pad_ammount)
+        subtitle = helpBox(
+            master=self,
+            size=30,
+            text="",
+            button=True,
+            help_text="This is a template csv file you can use to enter your students information.\n"
+            "StudentID is a string containing the students ID\n"
+            "username is the students username\n"
+            "surname is the students surname\n"
+            "firstname is the students first name\n"
+            "gender is the students gender M or F\n"
+            "home is the students origin, it can be either H for students from the UK or O for international students\n"
+            "average is the students average mark out of 100\n"
+            "team should be left blank or can contain a predetermined team that the student should be in\n"
+            "status can be left blank",
+        )
         subtitle.pack(side=TOP, pady=self.pad_ammount)
         self.row_count += 1
 
@@ -248,71 +291,137 @@ class App_front(customtkinter.CTk):
         # set diversity
         # subtitle = customtkinter.CTkLabel(master=self, text="Criteria", font=self.sub_title_font)
         # subtitle.pack(side=TOP,pady=self.pad_ammount)
-        subtitle = helpBox(master=self, size=30, text="Criteria", help_text="Select what criteria you would like to be active when generating your groups. \n For each criteria you can select a priority which will make that property more important ")
+        subtitle = helpBox(
+            master=self,
+            size=30,
+            text="Criteria",
+            help_text="Select what criteria you would like to be active when generating your groups. \n For each criteria you can select a priority which will make that property more important ",
+        )
         subtitle.pack(side=TOP, pady=self.pad_ammount)
         self.row_count += 1
-        self.groups = CriteriaFrame(self, type_to_make=["groups"], criteria_data=self.all_data)
+        self.groups = CriteriaFrame(
+            self, type_to_make=["groups"], criteria_data=self.all_data
+        )
         self.groups.pack(side=TOP, pady=self.pad_ammount)
         self.row_count += 1
         # subtitle = customtkinter.CTkLabel(master=self, text="Diversity", font=self.sub_sub_title_font)
         # subtitle.pack(side=TOP,pady=self.pad_ammount)
-        subtitle = helpBox(master=self, size=20, text="Diversity", help_text="This criteria tells the program to try and diversify these attributes of the students.\n for example 'average' will try to create diverse groups with a large range of averages")
+        subtitle = helpBox(
+            master=self,
+            size=20,
+            text="Diversity",
+            help_text="This criteria tells the program to try and diversify these attributes of the students.\n for example 'average' will try to create diverse groups with a large range of averages",
+        )
         subtitle.pack(side=TOP, pady=self.pad_ammount)
-
 
         self.row_count += 1
         # set types to be together
         self.criteria_diversity = [
-            CriteriaFrame(self, type_to_make=("diversity", "average"), criteria_data=self.criteria_data, all_data=self.all_data),
-            CriteriaFrame(self, type_to_make=("diversity", "home"), criteria_data=self.criteria_data, all_data=self.all_data),
-            CriteriaFrame(self, type_to_make=("diversity", "gender"), criteria_data=self.criteria_data, all_data=self.all_data)]
+            CriteriaFrame(
+                self,
+                type_to_make=("diversity", "average"),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+            CriteriaFrame(
+                self,
+                type_to_make=("diversity", "home"),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+            CriteriaFrame(
+                self,
+                type_to_make=("diversity", "gender"),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+        ]
         for i in range(self.row_count, self.row_count + len(self.criteria_diversity)):
-            self.criteria_diversity[i - self.row_count].pack(side=TOP,pady=0)
-
+            self.criteria_diversity[i - self.row_count].pack(side=TOP, pady=0)
 
         # subtitle = customtkinter.CTkLabel(master=self, text="Types that should be together", font=self.sub_sub_title_font)
         # subtitle.pack(side=TOP,pady=self.pad_ammount)
-        subtitle = helpBox(master=self, size=20, text="Types that should be together",
-                           help_text="This criteria allows you to specify which types should be grouped together,\n"
-                                     "for example you can specify that there should be at least 2 girls together in a group.\n "
-                                     "This is used when you don't want specific types to be alone ")
+        subtitle = helpBox(
+            master=self,
+            size=20,
+            text="Types that should be together",
+            help_text="This criteria allows you to specify which types should be grouped together,\n"
+            "for example you can specify that there should be at least 2 girls together in a group.\n "
+            "This is used when you don't want specific types to be alone ",
+        )
         subtitle.pack(side=TOP, pady=self.pad_ammount)
 
-        self.criteria_together= [CriteriaFrame(self, type_to_make=("types_together", ("Gender", "Male")),
-                                                 criteria_data=self.criteria_data, all_data=self.all_data),
-                                   CriteriaFrame(self, type_to_make=("types_together", ("Gender", "Female")),
-                                                 criteria_data=self.criteria_data, all_data=self.all_data),
-                                   CriteriaFrame(self, type_to_make=("types_together", ("home", "Home")),
-                                                 criteria_data=self.criteria_data, all_data=self.all_data),
-                                   CriteriaFrame(self, type_to_make=("types_together", ("home", "Online")),
-                                                 criteria_data=self.criteria_data, all_data=self.all_data)]
+        self.criteria_together = [
+            CriteriaFrame(
+                self,
+                type_to_make=("types_together", ("Gender", "Male")),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+            CriteriaFrame(
+                self,
+                type_to_make=("types_together", ("Gender", "Female")),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+            CriteriaFrame(
+                self,
+                type_to_make=("types_together", ("home", "Home")),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+            CriteriaFrame(
+                self,
+                type_to_make=("types_together", ("home", "Online")),
+                criteria_data=self.criteria_data,
+                all_data=self.all_data,
+            ),
+        ]
 
         for i in range(self.row_count, self.row_count + len(self.criteria_together)):
-            self.criteria_together[i - self.row_count].pack(side=TOP,pady=0)
+            self.criteria_together[i - self.row_count].pack(side=TOP, pady=0)
         self.row_count_marker = self.row_count
 
-
-        subtitle2 = helpBox(master=self, size=20, text="Select which students should be in specific teams",
-                           help_text="Once you have imported a student list using the button at the top of the page,\n you can specify which students you want to be in a specific team.\n"
-                                     "to do this double click in the team cell of the student you would like to set the team for. \n"
-                                     "if you cannot find the student use the search box above to sort through the results ")
+        subtitle2 = helpBox(
+            master=self,
+            size=20,
+            text="Select which students should be in specific teams",
+            help_text="Once you have imported a student list using the button at the top of the page,\n you can specify which students you want to be in a specific team.\n"
+            "to do this double click in the team cell of the student you would like to set the team for. \n"
+            "if you cannot find the student use the search box above to sort through the results ",
+        )
         subtitle2.pack(side=TOP, pady=self.pad_ammount)
 
-
-        self.table = TreeViewTable(self, items=[['StudentID', 'username','team']],row_size=200,title=None,height=10)
-        self.table.pack(side=TOP,pady=self.pad_ammount)
-        self.progressbar = customtkinter.CTkProgressBar(master=self, mode="indeterminate", width=400)
+        self.table = TreeViewTable(
+            self,
+            items=[["StudentID", "username", "team"]],
+            row_size=200,
+            title=None,
+            height=10,
+        )
+        self.table.pack(side=TOP, pady=self.pad_ammount)
+        self.progressbar = customtkinter.CTkProgressBar(
+            master=self, mode="indeterminate", width=400
+        )
         self.progressbar.pack(side=TOP, pady=self.pad_ammount)
-        self.button = customtkinter.CTkButton(master=self, text="Run", command= lambda: self.loop.create_task(self.run_event()))
+        self.button = customtkinter.CTkButton(
+            master=self,
+            text="Run",
+            command=lambda: self.loop.create_task(self.run_event()),
+        )
         self.button.configure(state="disabled")
         self.button.pack(side=TOP, pady=self.pad_ammount)
-        self.get_current = customtkinter.CTkButton(master=self, text="Get current results", command= self.early_update_table)
+        self.get_current = customtkinter.CTkButton(
+            master=self, text="Get current results", command=self.early_update_table
+        )
         self.get_current.configure(state="disabled")
         self.get_current.pack(side=TOP, pady=self.pad_ammount)
-        self.dialog_button = customtkinter.CTkButton(self, text="Show fitness graph", command=self.create_toplevel)
+        self.dialog_button = customtkinter.CTkButton(
+            self, text="Show fitness graph", command=self.create_toplevel
+        )
         self.dialog_button.configure(state="disabled")
         self.dialog_button.pack(side=TOP, pady=self.pad_ammount)
-        #CreateToolTip(self.dialog_button, "If no data is being displayed in the graph please open and close the box,\n"
+        # CreateToolTip(self.dialog_button, "If no data is being displayed in the graph please open and close the box,\n"
         #                                  " It can take a couple of seconds after running the program a second datapoint to be generated,\n having this box open can cause other elements of the application to respond slower")
 
 
@@ -321,9 +430,7 @@ def run_front_end():
 
 
 if __name__ == "__main__":
-
     run_front_end()
-
 
 
 # if __name__ == '__main__':

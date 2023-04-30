@@ -1,4 +1,6 @@
 from .Criteria_storage import CriteriaStorage
+
+
 class AllDataToSend:
     def __init__(self):
         self.size_of_teams = 2
@@ -16,21 +18,26 @@ class AllDataToSend:
 
     def set_all(self, dict1):
         self.__dict__ = dict1
+
     def set_result_path(self, path):
         self.result_path = path
 
     def get_result_path(self):
         return self.result_path
+
     def set_size_of_teams(self, value):
         self.size_of_teams = int(value)
+
     def shuffle(self, value: bool):
         self.size_of_teams = value
+
     def set_min_group_size_or_amount_of_groups(self, value: bool):
         self.min_group_size_or_amount_of_groups = value
+
     def set_criteria(self, value: CriteriaStorage):
         self.criteria = value
 
-    def set_weights(self, key,value):
+    def set_weights(self, key, value):
         self.weights[key] = value
 
     def set_data_path(self, value: str):

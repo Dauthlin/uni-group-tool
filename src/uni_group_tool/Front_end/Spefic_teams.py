@@ -7,10 +7,10 @@ from tkinter import ttk
 
 
 class SpecificTeams(customtkinter.CTkFrame):
-    def __init__(self, *args,items, **kwargs):
+    def __init__(self, *args, items, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.box = TreeViewTable(self,items=items)
+        self.box = TreeViewTable(self, items=items)
         self.box.grid(row=0, column=0, padx=20, pady=10)
 
     # def __init__(self):
