@@ -24,6 +24,7 @@ def get_csv(path: str):
         file = csv.DictReader(csvfile)
         return list(file)
 
+
 def get_csv_table_students(path: str):
     file1 = open(path, 'r')
     Lines = file1.readlines()
@@ -31,9 +32,7 @@ def get_csv_table_students(path: str):
     # Strips the newline character
     for line in Lines:
         all_line.append((line.split(",")[0:2])+[line.split(",")[7]])
-    #print(all_line)
     return all_line
-
 
 
 def save_csv(csv_input: dict[str | int, dict[str, str]]):
@@ -51,7 +50,7 @@ def extract_csv_data(csv_input):
         print(i["Names"])
 
 
-def initialize(csv_input:  dict[str | int, dict[str, str]], group_size: int, shuffle: bool,min_group_size_or_amount_of_groups:bool):
+def initialize(csv_input:  dict[str | int, dict[str, str]], group_size: int, shuffle: bool, min_group_size_or_amount_of_groups: bool):
     if min_group_size_or_amount_of_groups:
         number_of_groups = int(math.floor(len(csv_input) / group_size))
     else:
@@ -125,27 +124,25 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
     overall_fitness2 = teams2.fitness.get_all()
     collect_comparisons(overall_fitness1, teams1)
     collect_comparisons(overall_fitness2, teams2)
-    #print(temp)
     score1 = 0  # type: float
     score2 = 0  # type: float
     for i, j in zip(temp[teams1], temp[teams2]):
         weight = weights.get([k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
-        #print(weight,[k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
         if weight is None:
-            weight = .6
+            weight = .6  # type: ignore
         if temp[teams1][i] > temp[teams2][j]:
-            score1 += 1 * weight
+            score1 += 1 * weight  # type: ignore
             if temp[teams1][j] != 0:
-                score2 += (temp[teams2][i] / temp[teams1][j]) * weight
+                score2 += (temp[teams2][i] / temp[teams1][j]) * weight  # type: ignore
         if temp[teams1][i] < temp[teams2][j]:
-            score2 += 1 * weight
+            score2 += 1 * weight  # type: ignore
             if temp[teams2][j] != 0:
-                score1 += (temp[teams1][i] / temp[teams2][j]) * weight
-    #print(score1, score2)
+                score1 += (temp[teams1][i] / temp[teams2][j]) * weight  # type: ignore
     if score1 > score2:
         return True, teams1, score1 - score2
     else:
         return False, teams2, score2 - score1
+
 
 def compare_fitness_testing(teams1: Groups, teams2: Groups, weights: dict[str, int]):
     temp = {teams1: {}, teams2: {}}   # type: dict[Groups,dict[str,int]]
@@ -164,28 +161,25 @@ def compare_fitness_testing(teams1: Groups, teams2: Groups, weights: dict[str, i
     print(overall_fitness2)
     collect_comparisons(overall_fitness1, teams1)
     collect_comparisons(overall_fitness2, teams2)
-    #print(temp)
     score1 = 0  # type: float
     score2 = 0  # type: float
     for i, j in zip(temp[teams1], temp[teams2]):
         weight = weights.get([k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
-        #print(weight,[k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
         if weight is None:
-            weight = .6
+            weight = .6  # type: ignore
         if temp[teams1][i] > temp[teams2][j]:
-            score1 += 1 * weight
+            score1 += 1 * weight  # type: ignore
             if temp[teams1][j] != 0:
-                score2 += (temp[teams2][i] / temp[teams1][j]) * weight
+                score2 += (temp[teams2][i] / temp[teams1][j]) * weight  # type: ignore
         if temp[teams1][i] < temp[teams2][j]:
-            score2 += 1 * weight
+            score2 += 1 * weight  # type: ignore
             if temp[teams2][j] != 0:
-                score1 += (temp[teams1][i] / temp[teams2][j]) * weight
+                score1 += (temp[teams1][i] / temp[teams2][j]) * weight  # type: ignore
     print(score1, score2)
     if score1 > score2:
         return True, teams1, score1 - score2
     else:
         return False, teams2, score2 - score1
-
 
 
 def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple[int, int], criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
@@ -337,7 +331,7 @@ def score_custom():
     pass
 
 
-def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,min_group_size_or_amount_of_groups):
+def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving, min_group_size_or_amount_of_groups):
 
     # check tomorrow
     # in generating nothing should be passing asp by the end
@@ -347,9 +341,8 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,
     #             "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
     # critera for diverse average, 2 females together and 2 online together, and 3 students in specific groups
-    #print("not creashed")
     csv_input = get_csv(data_path)
-    current_all_team = Groups(initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))
+    current_all_team = Groups(initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
     # get the overall fitness of the whole thing
     overall_fitness(current_all_team, (range(0, current_all_team.number_of_groups())), criteria)  # type: ignore
 
@@ -362,8 +355,7 @@ def run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,
     while not stop(current_time, time_when_best_was_found):
         neighbours = generate_multiprocessing(current_all_team, best_team, current_time, criteria, weights)
         best_neighbour = select(neighbours, weights)
-        best_team, time_when_best_was_found, score = test(best_neighbour[0], best_team, current_time,
-                                                   time_when_best_was_found, weights)
+        best_team, time_when_best_was_found, score = test(best_neighbour[0], best_team, current_time, time_when_best_was_found, weights)
 
         current_all_team, current_time = update(best_neighbour, current_time)
         yield current_time, best_team, score
@@ -385,12 +377,12 @@ if __name__ == '__main__':
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
     size_of_teams = 5
     shuffle = True
-    weights =  {'gender': 1, 'average': 1, 'F': 1, 'O': 1, 'has_required_students': 1}
+    weights = {'gender': 1, 'average': 1, 'F': 1, 'O': 1, 'has_required_students': 1}
 
     data_path = "test_data/sample_short.csv"
     debugging = False
     saving = False
-    #testing
+    # testing
     scores = []
     best_teams = []
     best_teams_fitness = []
@@ -401,13 +393,11 @@ if __name__ == '__main__':
     random_team = Groups(initialize(csv_input, size_of_teams, shuffle, True))
     overall_fitness(random_team, (range(0, random_team.number_of_groups())), criteria)  # type: ignore
 
-
     for loop in range(100):
         score = 0
-        for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,True):
+        for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving, True):
             if len(i) > 2:
                 score += (i[2])
-            #print(score)
         best_teams.append(i[0])
         #  compare_fitness_testing(random_team, i[0], weights)
         best_teams_fitness.append(i[0].fitness.get_all())

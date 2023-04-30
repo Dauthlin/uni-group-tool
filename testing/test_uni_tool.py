@@ -135,7 +135,7 @@ def test_initialize():
     data_path = os.path.join(os.path.dirname(__file__), "test_data/sample_short.csv")
     csv_input = main_tools.get_csv(data_path)
     min_group_size_or_amount_of_groups = True
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))  # type: ignore
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))  # type: ignore
     current_all_team = main_tools.groups_to_csv(current_all_team)
     # check that each student contains the correct keys
     for i in current_all_team:
@@ -163,7 +163,7 @@ def test_single_fitness():
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))  # type: ignore
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))  # type: ignore
 
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [2], criteria)
@@ -198,7 +198,7 @@ def test_overall_fitness():
                 "amount_to_be_together": [("gender", "F", 2), ("gender", "M", 1), ("home", "O", 2), ("home", "H", 1)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
 
-    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle,min_group_size_or_amount_of_groups))
+    current_all_team = main_tools.Groups(main_tools.initialize(csv_input, size_of_teams, shuffle, min_group_size_or_amount_of_groups))
 
     group = copy.deepcopy(current_all_team)
     main_tools.overall_fitness(group, [2, 3], criteria)
@@ -449,7 +449,6 @@ def test_fitness_data():
                    'has_required_students': 1}
     test_fitness.set_all(replacement)
     assert test_fitness.get_all() == replacement
-
 
 
 if __name__ == '__main__':
