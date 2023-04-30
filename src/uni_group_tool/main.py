@@ -141,11 +141,51 @@ def compare_fitness(teams1: Groups, teams2: Groups, weights: dict[str, int]):
             score2 += 1 * weight
             if temp[teams2][j] != 0:
                 score1 += (temp[teams1][i] / temp[teams2][j]) * weight
-    # print(score1, score2)
+    #print(score1, score2)
     if score1 > score2:
         return True, teams1, score1 - score2
     else:
         return False, teams2, score2 - score1
+
+def compare_fitness_testing(teams1: Groups, teams2: Groups, weights: dict[str, int]):
+    temp = {teams1: {}, teams2: {}}   # type: dict[Groups,dict[str,int]]
+
+    def collect_comparisons(d, order):
+        for k, v in d.items():
+            if isinstance(v, dict):
+                collect_comparisons(v, order)
+            else:
+                if v is not None:
+                    temp[order][k] = v
+
+    overall_fitness1 = teams1.fitness.get_all()
+    overall_fitness2 = teams2.fitness.get_all()
+    print(overall_fitness1)
+    print(overall_fitness2)
+    collect_comparisons(overall_fitness1, teams1)
+    collect_comparisons(overall_fitness2, teams2)
+    #print(temp)
+    score1 = 0  # type: float
+    score2 = 0  # type: float
+    for i, j in zip(temp[teams1], temp[teams2]):
+        weight = weights.get([k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
+        #print(weight,[k for (k, v) in temp[teams1].items() if v == temp[teams1][i]][0])
+        if weight is None:
+            weight = .6
+        if temp[teams1][i] > temp[teams2][j]:
+            score1 += 1 * weight
+            if temp[teams1][j] != 0:
+                score2 += (temp[teams2][i] / temp[teams1][j]) * weight
+        if temp[teams1][i] < temp[teams2][j]:
+            score2 += 1 * weight
+            if temp[teams2][j] != 0:
+                score1 += (temp[teams1][i] / temp[teams2][j]) * weight
+    print(score1, score2)
+    if score1 > score2:
+        return True, teams1, score1 - score2
+    else:
+        return False, teams2, score2 - score1
+
 
 
 def overall_fitness(all_teams: Groups, modifed_groups_numbers: tuple[int, int], criteria: dict[str, list[str | tuple[str, str, int] | tuple[int, int]]]):
@@ -343,12 +383,45 @@ if __name__ == '__main__':
     criteria = {"diversity": ["average", "gender"],
                 "amount_to_be_together": [("gender", "F", 2), ("home", "O", 2)],
                 "specific_teams": [[("208026943", 3), ("208063956", 3), ("207069131", 4)]]}
-    size_of_teams = 3
+    size_of_teams = 5
     shuffle = True
-    weights =  {'gender': .2, 'average': .8, 'F': .2, 'O': .2, 'has_required_students': .2}
+    weights =  {'gender': 1, 'average': 1, 'F': 1, 'O': 1, 'has_required_students': 1}
 
     data_path = "test_data/sample_short.csv"
     debugging = False
-    saving = True
-    for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,True):
-        print(i)
+    saving = False
+    #testing
+    scores = []
+    best_teams = []
+    best_teams_fitness = []
+    comparisons = []
+    comparisons_random = []
+
+    csv_input = get_csv(data_path)
+    random_team = Groups(initialize(csv_input, size_of_teams, shuffle, True))
+    overall_fitness(random_team, (range(0, random_team.number_of_groups())), criteria)  # type: ignore
+
+
+    for loop in range(100):
+        score = 0
+        for i in run(criteria, size_of_teams, shuffle, weights, data_path, debugging, saving,True):
+            if len(i) > 2:
+                score += (i[2])
+            #print(score)
+        best_teams.append(i[0])
+        #  compare_fitness_testing(random_team, i[0], weights)
+        best_teams_fitness.append(i[0].fitness.get_all())
+        scores.append(score)
+    print("scores")
+    print(scores)
+    print("fitness")
+    print(best_teams_fitness)
+    print("comparisons")
+    for i in best_teams:
+        comparisons.append(compare_fitness(best_teams[0], i, weights)[2])
+    print(comparisons)
+    print("comparisons random")
+
+    for i in best_teams:
+        comparisons_random.append(compare_fitness(random_team, i, weights)[2])
+    print(comparisons_random)

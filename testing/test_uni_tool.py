@@ -341,7 +341,6 @@ def test_generate():
                      [('name4', 4), ('name23', 4), ('name5', 4), ('name42', 5), ('name24', 5), ('name43', 5)],
                      [('name4', 4), ('name23', 4), ('name24', 4), ('name5', 5), ('name42', 5), ('name43', 5)],
                      [('name4', 4), ('name23', 4), ('name43', 4), ('name5', 5), ('name24', 5), ('name42', 5)]]
-
     # repeat with slower generating
     neighbours = main_tools.generate(subgroup1, bestgroup, 0, criteria, {})
     names = []
@@ -356,7 +355,6 @@ def test_generate():
                      [('name4', 4), ('name23', 4), ('name5', 4), ('name42', 5), ('name24', 5), ('name43', 5)],
                      [('name4', 4), ('name23', 4), ('name24', 4), ('name5', 5), ('name42', 5), ('name43', 5)],
                      [('name4', 4), ('name23', 4), ('name43', 4), ('name5', 5), ('name24', 5), ('name42', 5)]]
-
     # change the tabu time for one of the students
     subgroup1.get_groups()[0].get_student(0).tabu_time = 10
     neighbours = main_tools.generate_multiprocessing(subgroup1, bestgroup, 11, criteria, {})
